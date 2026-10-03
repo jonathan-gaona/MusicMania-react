@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-// Arreglo de productos para mantener el código limpio y mantenible
 const productosEquipos = [
   {
     id: 1,
@@ -47,19 +46,63 @@ const productosEquipos = [
 ];
 
 export const Equipos = ({ agregarAlCarrito }) => {
+  // Estado para controlar el mensaje interactivo
+  const [mensajeToast, setMensajeToast] = useState('');
+
+  const handleAgregar = (producto) => {
+    // 1. Ejecutar la función original del carrito
+    if (agregarAlCarrito) {
+      agregarAlCarrito({
+        nombre: producto.nombre,
+        precio: producto.precio,
+        imagen: producto.imagen,
+      });
+    }
+
+    // 2. Mostrar la notificación interactiva
+    setMensajeToast(`¡"${producto.nombre}" se agregó al carrito!`);
+
+    // 3. Ocultar la notificación automáticamente tras 3 segundos
+    setTimeout(() => {
+      setMensajeToast('');
+    }, 3000);
+  };
+
   return (
-    <main className="container py-5 text-white"> 
+    <main className="container py-5 text-white position-relative">
+      
+      {/* Toast Notificación Flotante */}
+      {mensajeToast && (
+        <div 
+          className="position-fixed top-0 end-0 p-3" 
+          style={{ zIndex: 1055, marginTop: '70px' }}
+        >
+          <div className="toast show align-items-center text-bg-success border-0 shadow-lg" role="alert">
+            <div className="d-flex">
+              <div className="toast-body fw-bold">
+                <i className="bi bi-check-circle-fill me-2"></i>
+                {mensajeToast}
+              </div>
+              <button 
+                type="button" 
+                className="btn-close btn-close-white me-2 m-auto" 
+                onClick={() => setMensajeToast('')}
+              ></button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className="text-center mb-5">
         <h1 className="display-5 fw-bold text-uppercase">Tornamesas & Equipos de Audio</h1>
-        {/* 2. Cambiamos 'text-muted' por 'text-white-50' */}
-        <p className="lead text-white">Lleva la alta fidelidad del sonido análogo a tu hogar.</p>
+        <p className="lead text-white-50">Lleva la alta fidelidad del sonido análogo a tu hogar.</p>
       </header>
 
       {/* Grid de Productos */}
       <div className="row g-4">
         {productosEquipos.map((producto) => (
           <article key={producto.id} className="col-md-6 col-lg-4">
-            <div className="card h-100 tarjeta shadow-sm border-0">
+            <div className="card h-100 tarjeta shadow-sm border-0 text-dark">
               <img
                 src={producto.imagen}
                 className="card-img-top img-efecto"
@@ -76,14 +119,7 @@ export const Equipos = ({ agregarAlCarrito }) => {
                   </span>
                   <button
                     className="btn btn-outline-danger btn-sm fw-bold"
-                    onClick={() =>
-                      agregarAlCarrito &&
-                      agregarAlCarrito({
-                        nombre: producto.nombre,
-                        precio: producto.precio,
-                        imagen: producto.imagen,
-                      })
-                    }
+                    onClick={() => handleAgregar(producto)}
                   >
                     Añadir al Carrito
                   </button>

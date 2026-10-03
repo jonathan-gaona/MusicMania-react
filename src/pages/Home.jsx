@@ -100,10 +100,10 @@ export const Home = () => {
       </section>
 
       {/* Video Embebido */}
-      <section className="py-5 bg-light text-center">
+      <section className="py-5 bg-dark text-center">
         <div className="container">
-          <h3 className="text-dark mb-3">La Experiencia del Vinilo</h3>
-          <p className="text-dark mb-4">
+          <h3 className="text-light mb-3">La Experiencia del Vinilo</h3>
+          <p className="text-light mb-4">
             Descubre la magia del sonido análogo en nuestra tienda.
           </p>
           <div className="ratio ratio-16x9 mx-auto" style={{ maxWidth: '700px' }}>
