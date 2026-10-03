@@ -31,7 +31,7 @@ export const Home = () => {
       <section className="py-5">
         <div className="container">
           <h3 className="text-center mb-2 fs-2 fw-bold">Explora MusicMania</h3>
-          <p className="text-center text-muted mb-5">
+          <p className="text-center mb-5">
             Encuentra todo lo que necesitas para elevar tu experiencia musical
           </p>
 
@@ -102,8 +102,8 @@ export const Home = () => {
       {/* Video Embebido */}
       <section className="py-5 bg-light text-center">
         <div className="container">
-          <h3 className="fw-bold mb-3">La Experiencia del Vinilo</h3>
-          <p className="text-muted mb-4">
+          <h3 className="text-dark mb-3">La Experiencia del Vinilo</h3>
+          <p className="text-dark mb-4">
             Descubre la magia del sonido análogo en nuestra tienda.
           </p>
           <div className="ratio ratio-16x9 mx-auto" style={{ maxWidth: '700px' }}>
@@ -132,10 +132,10 @@ export const Home = () => {
             </div>
             <div className="col-md-7 text-center text-md-start">
               <h3 className="fw-bold">¿Quiénes Somos?</h3>
-              <p className="text-muted">
+              <p className="text">
                 Somos un proyecto apasionado por la música física. Conoce más sobre nuestra historia y equipo.
               </p>
-              <Link to="/sobre-nosotros" className="btn btn-dark fw-bold">
+              <Link to="/sobre-nosotros" className="btn btn-light text-dark fw-bold">
                 Conócenos
               </Link>
             </div>
