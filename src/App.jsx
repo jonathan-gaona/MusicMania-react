@@ -5,6 +5,7 @@ import { Footer } from './components/Footer';
 import { CatalogoAlbumes } from './pages/CatalogoAlbumes';
 import { Home } from './pages/Home';
 import { Contacto } from './pages/Contacto';
+import { Equipos } from './pages/Equipos';
 
 function App() {
   // Estado global para controlar los elementos agregados al carrito
@@ -30,6 +31,8 @@ function App() {
           <Route path="/catalogo" element={<CatalogoAlbumes agregarAlCarrito={agregarAlCarrito} />} />
           
           <Route path="/contacto" element={<Contacto />} />
+
+          <Route path="/equipos" element={<Equipos agregarAlCarrito={agregarAlCarrito} />} />
 
           {/* Aquí tú y tus compañeros irán agregando las demás rutas del proyecto */}
         </Routes>
