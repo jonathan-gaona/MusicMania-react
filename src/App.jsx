@@ -4,6 +4,8 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { CatalogoAlbumes } from './pages/CatalogoAlbumes';
 import { Home } from './pages/Home';
+import { SobreNosotros } from './pages/SobreNosotros';
+import { Registro } from './pages/Registro';
 import { Contacto } from './pages/Contacto';
 import { Equipos } from './pages/Equipos';
 import { Carrito } from './pages/Carrito';
@@ -27,9 +29,10 @@ function App() {
         <Routes>
           {/* Ruta de inicio que carga la vista Home */}
           <Route path="/" element={<Home />} />
-
           {/* Ruta del Catálogo con funcionalidad de agregar al carrito */}
           <Route path="/catalogo" element={<CatalogoAlbumes agregarAlCarrito={agregarAlCarrito} />} />
+          <Route path="sobre-nosotros" element={<SobreNosotros />} /> 
+          <Route path="/registro" element={<Registro />} />
           
           <Route path="/contacto" element={<Contacto />} />
 
