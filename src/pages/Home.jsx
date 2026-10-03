@@ -38,7 +38,7 @@ export const Home = () => {
           <div className="row g-4 justify-content-center">
             {/* Tarjeta 1: Vinilos */}
             <article className="col-md-4">
-              <div className="card h-100 tarjeta shadow-sm border-0">
+              <div className="card h-100 bg-dark text-white border-secondary shadow-sm">
                 <img
                   src="https://images.unsplash.com/photo-1539375665275-f9de415ef9ac?auto=format&fit=crop&w=600&q=80"
                   className="card-img-top img-efecto"
@@ -46,7 +46,7 @@ export const Home = () => {
                 />
                 <div className="card-body text-center d-flex flex-column">
                   <h4 className="card-title fw-bold fs-5">Vinilos &amp; LPs Exclusivos</h4>
-                  <p className="card-text text-muted small flex-grow-1">
+                  <p className="card-text text-light small flex-grow-1">
                     Ediciones limitadas, clásicos del rock, jazz y los últimos lanzamientos en formato análogo.
                   </p>
                   <Link to="/catalogo" className="btn btn-danger w-100 mt-3 fw-bold">
@@ -58,7 +58,7 @@ export const Home = () => {
 
             {/* Tarjeta 2: Tornamesas/Equipos */}
             <article className="col-md-4">
-              <div className="card h-100 tarjeta shadow-sm border-0">
+              <div className="card h-100 bg-dark text-white border-secondary shadow-sm">
                 <img
                   src="https://images.unsplash.com/photo-1542208998-f6dbbb27a72f?auto=format&fit=crop&w=600&q=80"
                   className="card-img-top img-efecto"
@@ -66,10 +66,10 @@ export const Home = () => {
                 />
                 <div className="card-body text-center d-flex flex-column">
                   <h4 className="card-title fw-bold fs-5">Tornamesas &amp; Audio</h4>
-                  <p className="card-text text-muted small flex-grow-1">
+                  <p className="card-text text-light small flex-grow-1">
                     Equipos de alta fidelidad, agujas de repuesto y amplificadores para tu sistema de sonido.
                   </p>
-                  <Link to="/equipos" className="btn btn-outline-danger w-100 mt-3 fw-bold">
+                  <Link to="/equipos" className="btn btn-danger w-100 mt-3 fw-bold">
                     Ver Equipos
                   </Link>
                 </div>
@@ -78,7 +78,7 @@ export const Home = () => {
 
             {/* Tarjeta 3: Blog y Noticias */}
             <article className="col-md-4">
-              <div className="card h-100 tarjeta shadow-sm border-0">
+              <div className="card h-100 bg-dark text-white border-secondary shadow-sm">
                 <img
                   src="https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&w=600&q=80"
                   className="card-img-top img-efecto"
@@ -86,10 +86,10 @@ export const Home = () => {
                 />
                 <div className="card-body text-center d-flex flex-column">
                   <h4 className="card-title fw-bold fs-5">Reseñas &amp; Comunidad</h4>
-                  <p className="card-text text-muted small flex-grow-1">
+                  <p className="card-text text-light small flex-grow-1">
                     Lee las opiniones de nuestros expertos sobre los álbumes más icónicos de la historia.
                   </p>
-                  <Link to="/blog" className="btn btn-outline-dark w-100 mt-3 fw-bold">
+                  <Link to="/blog" className="btn btn-danger w-100 mt-3 fw-bold">
                     Leer Blog
                   </Link>
                 </div>

@@ -46,11 +46,9 @@ const productosEquipos = [
 ];
 
 export const Equipos = ({ agregarAlCarrito }) => {
-  // Estado para controlar el mensaje interactivo
-  const [mensajeToast, setMensajeToast] = useState('');
+  const [toast, setToast] = useState('');
 
   const handleAgregar = (producto) => {
-    // 1. Ejecutar la función original del carrito
     if (agregarAlCarrito) {
       agregarAlCarrito({
         nombre: producto.nombre,
@@ -59,12 +57,10 @@ export const Equipos = ({ agregarAlCarrito }) => {
       });
     }
 
-    // 2. Mostrar la notificación interactiva
-    setMensajeToast(`¡"${producto.nombre}" se agregó al carrito!`);
+    setToast(`¡"${producto.nombre}" se agregó al carrito!`);
 
-    // 3. Ocultar la notificación automáticamente tras 3 segundos
     setTimeout(() => {
-      setMensajeToast('');
+      setToast('');
     }, 3000);
   };
 
@@ -72,21 +68,21 @@ export const Equipos = ({ agregarAlCarrito }) => {
     <main className="container py-5 text-white position-relative">
       
       {/* Toast Notificación Flotante */}
-      {mensajeToast && (
+      {toast && (
         <div 
           className="position-fixed top-0 end-0 p-3" 
           style={{ zIndex: 1055, marginTop: '70px' }}
         >
           <div className="toast show align-items-center text-bg-success border-0 shadow-lg" role="alert">
             <div className="d-flex">
-              <div className="toast-body fw-bold">
+              <div className="toast-body fw-bold fs-6">
                 <i className="bi bi-check-circle-fill me-2"></i>
-                {mensajeToast}
+                {toast}
               </div>
               <button 
                 type="button" 
                 className="btn-close btn-close-white me-2 m-auto" 
-                onClick={() => setMensajeToast('')}
+                onClick={() => setToast('')}
               ></button>
             </div>
           </div>
@@ -102,18 +98,20 @@ export const Equipos = ({ agregarAlCarrito }) => {
       <div className="row g-4">
         {productosEquipos.map((producto) => (
           <article key={producto.id} className="col-md-6 col-lg-4">
-            <div className="card h-100 tarjeta shadow-sm border-0 text-dark">
+            {/* Tarjeta con fondo oscuro y borde sutil */}
+            <div className="card h-100 bg-dark text-white border-secondary shadow-sm">
               <img
                 src={producto.imagen}
                 className="card-img-top img-efecto"
                 alt={producto.nombre}
+                style={{ height: '220px', objectFit: 'cover' }} // <-- Tamaño uniforme sin deformar
               />
               <div className="card-body d-flex flex-column">
                 <h2 className="card-title h5 fw-bold">{producto.nombre}</h2>
-                <p className="card-text text-muted small flex-grow-1">
+                <p className="card-text text-white-50 small flex-grow-1">
                   {producto.descripcion}
                 </p>
-                <div className="d-flex justify-content-between align-items-center mt-3">
+                <div className="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-secondary">
                   <span className="fs-4 fw-bold text-danger">
                     $ {producto.precio.toLocaleString('es-CL')}
                   </span>
