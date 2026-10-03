@@ -5,6 +5,7 @@ import { Footer } from './components/Footer';
 import { CatalogoAlbumes } from './pages/CatalogoAlbumes';
 import { Home } from './pages/Home';
 import { SobreNosotros } from './pages/SobreNosotros';
+import { Registro } from './pages/Registro';
 
 function App() {
   // Estado global para controlar los elementos agregados al carrito
@@ -25,12 +26,11 @@ function App() {
         <Routes>
           {/* Ruta de inicio que carga la vista Home */}
           <Route path="/" element={<Home />} />
-
           {/* Ruta del Catálogo con funcionalidad de agregar al carrito */}
           <Route path="/catalogo" element={<CatalogoAlbumes agregarAlCarrito={agregarAlCarrito} />} />
           <Route path="sobre-nosotros" element={<SobreNosotros />} /> 
+          <Route path="/registro" element={<Registro />} />
           
-          {/* Aquí tú y tus compañeros irán agregando las demás rutas del proyecto */}
         </Routes>
       </div>
 
