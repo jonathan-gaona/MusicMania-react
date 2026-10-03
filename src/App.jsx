@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { CatalogoAlbumes } from './pages/CatalogoAlbumes';
+import { Home } from './pages/Home';
 
 function App() {
   // Estado global para controlar los elementos agregados al carrito
@@ -21,7 +22,10 @@ function App() {
 
         {/* 2. El contenido central cambia según la ruta/página actual */}
         <Routes>
-          <Route path="/" element={<CatalogoAlbumes agregarAlCarrito={agregarAlCarrito} />} />
+          {/* Ruta de inicio que carga la vista Home */}
+          <Route path="/" element={<Home />} />
+
+          {/* Ruta del Catálogo con funcionalidad de agregar al carrito */}
           <Route path="/catalogo" element={<CatalogoAlbumes agregarAlCarrito={agregarAlCarrito} />} />
           
           {/* Aquí tú y tus compañeros irán agregando las demás rutas del proyecto */}
