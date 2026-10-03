@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-// Datos de regiones y comunas de Chile para el selector dinámico
 const datosRegiones = {
-  'Coquimbo': ['La Serena', 'Coquimbo', 'Ovalle', 'IllaPele', 'Vicuña'],
+  'Coquimbo': ['La Serena', 'Coquimbo', 'Ovalle', 'Illapel', 'Vicuña'],
   'Valparaíso': ['Valparaíso', 'Viña del Mar', 'Quilpué', 'Villa Alemana', 'Concón'],
   'Región Metropolitana': ['Santiago', 'Providencia', 'Las Condes', 'Maipú', 'La Florida', 'Puente Alto'],
   'Biobío': ['Concepción', 'Talcahuano', 'San Pedro de la Paz', 'Chillán', 'Los Ángeles']
@@ -23,12 +22,10 @@ export const Registro = () => {
   });
 
   const [errores, setErrores] = useState({});
+  const [mostrarToast, setMostrarToast] = useState(false);
 
-  // Manejador de cambios en los inputs
   const handleChange = (e) => {
     const { id, value } = e.target;
-    
-    // Si cambia la región, reiniciamos la comuna
     if (id === 'region') {
       setFormData((prev) => ({
         ...prev,
@@ -43,26 +40,40 @@ export const Registro = () => {
     }
   };
 
-  // Función de validación del formulario
   const validarFormulario = () => {
     let nuevosErrores = {};
 
-    // Validar RUN (7 a 9 caracteres alfanuméricos)
+    // 1. RUN estrictamente sin puntos ni guion
     const runRegex = /^[0-9]{7,8}[0-9kK]{1}$/;
-    if (!runRegex.test(formData.run.replace(/[-.]/g, ''))) {
-      nuevosErrores.run = 'RUN inválido. Debe tener entre 7 y 9 caracteres (sin puntos ni guión).';
+    if (!formData.run.trim()) {
+      nuevosErrores.run = 'El RUN es obligatorio.';
+    } else if (!runRegex.test(formData.run.trim())) {
+      nuevosErrores.run = 'Ingresa el RUN sin puntos ni guion (ejemplo: 193091180).';
     }
 
-    if (!formData.nombre.trim()) nuevosErrores.nombre = 'El nombre es obligatorio.';
-    if (!formData.apellidos.trim()) nuevosErrores.apellidos = 'Los apellidos son obligatorios.';
+    // 2. Solo letras para Nombre y Apellidos
+    const soloLetrasRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+    if (!formData.nombre.trim()) {
+      nuevosErrores.nombre = 'El nombre es obligatorio.';
+    } else if (!soloLetrasRegex.test(formData.nombre.trim())) {
+      nuevosErrores.nombre = 'El nombre solo debe contener letras.';
+    }
 
-    // Validar dominio del correo
+    if (!formData.apellidos.trim()) {
+      nuevosErrores.apellidos = 'Los apellidos son obligatorios.';
+    } else if (!soloLetrasRegex.test(formData.apellidos.trim())) {
+      nuevosErrores.apellidos = 'Los apellidos solo deben contener letras.';
+    }
+
+    // 3. Correo permitido
     const correoRegex = /^[a-zA-Z0-9._%+-]+@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/i;
-    if (!correoRegex.test(formData.correo)) {
+    if (!formData.correo.trim()) {
+      nuevosErrores.correo = 'El correo es obligatorio.';
+    } else if (!correoRegex.test(formData.correo.trim())) {
       nuevosErrores.correo = 'Solo se permiten correos @duoc.cl, @profesor.duoc.cl o @gmail.com.';
     }
 
-    // Validar contraseña
+    // 4. Contraseña
     if (formData.password.length < 4 || formData.password.length > 10) {
       nuevosErrores.password = 'La contraseña debe tener entre 4 y 10 caracteres.';
     }
@@ -71,6 +82,7 @@ export const Registro = () => {
       nuevosErrores.confirmPassword = 'Las contraseñas no coinciden.';
     }
 
+    // 5. Ubicación
     if (!formData.region) nuevosErrores.region = 'Seleccione una región.';
     if (!formData.comuna) nuevosErrores.comuna = 'Seleccione una comuna.';
     if (!formData.direccion.trim()) nuevosErrores.direccion = 'La dirección es obligatoria.';
@@ -82,13 +94,41 @@ export const Registro = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validarFormulario()) {
-      alert('¡Usuario registrado exitosamente en MusicMania!');
-      // Aquí conectarán la API o servicio de backend más adelante
+      setMostrarToast(true);
+
+      // Cierra automáticamente el Toast a los 4 segundos
+      setTimeout(() => {
+        setMostrarToast(false);
+      }, 4000);
     }
   };
 
   return (
-    <main className="bg-dark text-white min-vh-100 py-5">
+    <main className="bg-dark text-white min-vh-100 py-5 position-relative">
+      
+      {/* MENSAGE TOAST ESTILO MUSICMANIA (MODERNO Y OSCURO) */}
+      {mostrarToast && (
+        <div className="toast-container position-fixed bottom-0 end-0 p-3" style={{ zIndex: 1100 }}>
+          <div className="toast show bg-dark text-white border border-danger shadow-lg" role="alert">
+            <div className="toast-header bg-danger text-white">
+              <strong className="me-auto">🎉 MusicMania</strong>
+              <small className="text-white-50">Ahora mismo</small>
+              <button
+                type="button"
+                className="btn-close btn-close-white"
+                onClick={() => setMostrarToast(false)}
+              ></button>
+            </div>
+            <div className="toast-body bg-dark text-white p-3">
+              <p className="fw-bold mb-1 text-danger">¡Usuario registrado con éxito!</p>
+              <small className="text-white-50">
+                Tu cuenta ha sido creada correctamente. Ya puedes iniciar sesión para disfrutar de la mejor música.
+              </small>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-lg-8">
@@ -111,7 +151,7 @@ export const Registro = () => {
                         type="text"
                         className={`form-control bg-dark text-white border-secondary ${errores.run ? 'is-invalid' : ''}`}
                         id="run"
-                        placeholder="19011022K"
+                        placeholder="193091180"
                         value={formData.run}
                         onChange={handleChange}
                       />
