@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const Carrito = ({ carrito, setCarrito }) => {
+  const navigate = useNavigate();
   // Estado para la notificación interactiva (Toast)
   const [toast, setToast] = useState({ mensaje: '', tipo: 'success' });
-
-  // Calcular el precio total del carrito
-  const total = carrito.reduce((acumulador, producto) => acumulador + producto.precio, 0);
 
   // Función para mostrar la notificación flotante
   const mostrarNotificacion = (mensaje, tipo = 'success') => {
@@ -16,11 +14,25 @@ export const Carrito = ({ carrito, setCarrito }) => {
     }, 3500);
   };
 
-  // Función para eliminar un producto individual
-  const eliminarProducto = (indexAEliminar) => {
-    const productoEliminado = carrito[indexAEliminar];
-    setCarrito(carrito.filter((_, index) => index !== indexAEliminar));
-    mostrarNotificacion(`"${productoEliminado.nombre}" fue eliminado del carrito.`, 'warning');
+  // Función para modificar la cantidad de un producto (+1 / -1)
+  const cambiarCantidad = (id, delta) => {
+    setCarrito((prev) =>
+      prev
+        .map((producto) => {
+          if (producto.id === id) {
+            const nuevaCantidad = (producto.cantidad || 1) + delta;
+            return nuevaCantidad > 0 ? { ...producto, cantidad: nuevaCantidad } : null;
+          }
+          return producto;
+        })
+        .filter(Boolean)
+    );
+  };
+
+  // Función para eliminar un producto individual mediante su ID
+  const eliminarProducto = (id, nombre) => {
+    setCarrito((prev) => prev.filter((producto) => producto.id !== id));
+    mostrarNotificacion(`"${nombre}" fue eliminado del carrito.`, 'warning');
   };
 
   // Función para vaciar todo el carrito
@@ -29,11 +41,16 @@ export const Carrito = ({ carrito, setCarrito }) => {
     mostrarNotificacion('El carrito ha sido vaciado correctamente.', 'warning');
   };
 
-  // Función para procesar el pago
-  const procesarPago = () => {
-    setCarrito([]);
-    mostrarNotificacion('¡Gracias por tu compra! Tu pedido está en proceso.', 'success');
+  // Redirigir al flujo de Checkout al hacer clic en PAGAR
+  const irAlCheckout = () => {
+    navigate('/checkout');
   };
+
+  // Calcular el precio total considerando precio unitario * cantidad
+  const total = carrito.reduce(
+    (acumulador, producto) => acumulador + (producto.precio || 0) * (producto.cantidad || 1),
+    0
+  );
 
   return (
     <main className="container py-5 text-white position-relative">
@@ -84,33 +101,56 @@ export const Carrito = ({ carrito, setCarrito }) => {
             </div>
           ) : (
             <div className="d-flex flex-column gap-3">
-              {carrito.map((producto, index) => (
-                <article 
-                  key={index} 
-                  className="card p-3 shadow-sm border-secondary bg-dark text-white d-flex flex-row align-items-center justify-content-between"
-                >
-                  <div className="d-flex align-items-center gap-3">
-                    <img 
-                      src={producto.imagen} 
-                      alt={producto.nombre} 
-                      style={{ width: '80px', height: '80px', objectFit: 'cover' }} 
-                      className="rounded"
-                    />
-                    <div>
-                      <h2 className="h6 mb-1 fw-bold">{producto.nombre}</h2>
-                      <span className="text-danger fw-bold fs-5">
-                        $ {producto.precio.toLocaleString('es-CL')}
-                      </span>
-                    </div>
-                  </div>
-                  <button 
-                    className="btn btn-outline-danger btn-sm fw-bold"
-                    onClick={() => eliminarProducto(index)}
+              {carrito.map((producto) => {
+                const cantidad = producto.cantidad || 1;
+                const subtotal = (producto.precio || 0) * cantidad;
+
+                return (
+                  <article 
+                    key={producto.id} 
+                    className="card p-3 shadow-sm border-secondary bg-dark text-white d-flex flex-row align-items-center justify-content-between flex-wrap gap-3"
                   >
-                    Eliminar
-                  </button>
-                </article>
-              ))}
+                    <div className="d-flex align-items-center gap-3">
+                      <img 
+                        src={producto.imagen} 
+                        alt={producto.nombre} 
+                        style={{ width: '80px', height: '80px', objectFit: 'cover' }} 
+                        className="rounded"
+                      />
+                      <div>
+                        <h2 className="h6 mb-1 fw-bold">{producto.nombre}</h2>
+                        <span className="text-danger fw-bold fs-5">
+                          $ {subtotal.toLocaleString('es-CL')}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Controles de Cantidad (+ / -) */}
+                    <div className="d-flex align-items-center gap-2 bg-secondary bg-opacity-25 rounded px-2 py-1">
+                      <button 
+                        className="btn btn-sm btn-outline-light border-0 fw-bold px-2"
+                        onClick={() => cambiarCantidad(producto.id, -1)}
+                      >
+                        -
+                      </button>
+                      <span className="fw-bold fs-6 px-2">{cantidad}</span>
+                      <button 
+                        className="btn btn-sm btn-outline-light border-0 fw-bold px-2"
+                        onClick={() => cambiarCantidad(producto.id, 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button 
+                      className="btn btn-outline-danger btn-sm fw-bold"
+                      onClick={() => eliminarProducto(producto.id, producto.nombre)}
+                    >
+                      Eliminar
+                    </button>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
@@ -134,7 +174,7 @@ export const Carrito = ({ carrito, setCarrito }) => {
                 type="button" 
                 className="btn btn-danger btn-lg fw-bold"
                 disabled={carrito.length === 0}
-                onClick={procesarPago}
+                onClick={irAlCheckout}
               >
                 PAGAR
               </button>

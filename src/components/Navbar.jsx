@@ -26,7 +26,7 @@ export const Navbar = ({ totalItemsCarrito = 0 }) => {
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
                 <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/">
-                    Inicio
+                  Inicio
                 </NavLink>
               </li>
               <li className="nav-item">
@@ -39,6 +39,19 @@ export const Navbar = ({ totalItemsCarrito = 0 }) => {
                   Equipos
                 </NavLink>
               </li>
+
+              {/* Nuevas vistas requeridas agregadas al menú */}
+              <li className="nav-item">
+                <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/categorias">
+                  Categorías
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/ofertas">
+                  Ofertas
+                </NavLink>
+              </li>
+
               <li className="nav-item">
                 <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/blog">
                   Blog
