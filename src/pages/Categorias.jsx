@@ -1,55 +1,192 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { albumes } from '../data/albumesData';
 
-const productosData = [
-  { id: 1, nombre: 'Abbey Road - The Beatles', categoria: 'Vinilos', precio: 34990, imagen: '/img/abbey.jpg' },
-  { id: 2, nombre: 'Dark Side of the Moon - Pink Floyd', categoria: 'Vinilos', precio: 38990, imagen: '/img/pinkfloyd.jpg' },
-  { id: 3, nombre: 'Amplificador Marshall', categoria: 'Equipos', precio: 399990, imagen: '/img/amplificadorMarshall.jpg' },
-  { id: 4, nombre: 'Tornamesa Audio-Technica', categoria: 'Equipos', precio: 199990, imagen: '/img/tocadiscos.jpg' },
-  { id: 5, nombre: 'Limpiador de Vinilos Pro', categoria: 'Accesorios', precio: 15990, imagen: '/img/limpiador.jpg' }
+// Reutilizamos la misma lista de Equipos
+const productosEquipos = [
+  {
+    id: 'eq-1',
+    categoria: 'equipos',
+    nombre: 'Amplificador de Guitarra Marshall',
+    precio: 399990,
+    imagen: '/img/amplificadorMarshall.jpg',
+  },
+  {
+    id: 'eq-2',
+    categoria: 'equipos',
+    nombre: 'Micrófono de Condensador',
+    precio: 149990,
+    imagen: '/img/microfonopro.jpg',
+  },
+  {
+    id: 'eq-3',
+    categoria: 'equipos',
+    nombre: 'Controladora DJ Pro',
+    precio: 399990,
+    imagen: '/img/tornamesa.jpg',
+  },
+  {
+    id: 'eq-4',
+    categoria: 'equipos',
+    nombre: 'Parlante de P.A. Profesional',
+    precio: 199990,
+    imagen: '/img/parlantejbl.jpg',
+  },
+  {
+    id: 'eq-5',
+    categoria: 'equipos',
+    nombre: 'Tornamesa Estéreo Retro Hi-Fi',
+    precio: 99990,
+    imagen: '/img/tocadiscos.jpg',
+  },
+  {
+    id: 'eq-6',
+    categoria: 'equipos',
+    nombre: 'Parlantes Monitor Audio Bronze',
+    precio: 149990,
+    imagen: '/img/parlante2.jpg',
+  },
+];
+
+// Accesorios de ejemplo con imágenes reales de tu proyecto
+const productosAccesorios = [
+  {
+    id: 'acc-1',
+    categoria: 'accesorios',
+    nombre: 'Limpiador de Vinilos v1',
+    precio: 15990,
+    imagen: '/img/limpiadorVinilos.jpg', // Cambia por la ruta de imagen real de tus accesorios
+  },
+  {
+    id: 'acc-2',
+    categoria: 'accesorios',
+    nombre: 'Limpiador de Vinilos Pro',
+    precio: 17990,
+    imagen: '/img/Limpiavinilo2.jpg', // Cambia por la ruta de imagen real de tus accesorios
+  },
 ];
 
 export const Categorias = ({ agregarAlCarrito }) => {
-  const [categoriaSel, setCategoriaSel] = useState('Todas');
-  const categorias = ['Todas', 'Vinilos', 'Equipos', 'Accesorios'];
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('todas');
+  const [toast, setToast] = useState('');
 
-  const productosFiltrados = categoriaSel === 'Todas' 
-    ? productosData 
-    : productosData.filter(p => p.categoria === categoriaSel);
+  // Formateamos álbumes para que coincidan con la estructura general
+  const vinilosFormateados = albumes.map((alb) => ({
+    id: alb.id,
+    categoria: 'vinilos',
+    nombre: `${alb.titulo} - ${alb.artista}`,
+    precio: alb.precio,
+    imagen: alb.imagen,
+    ...alb
+  }));
+
+  // Combinar todos los productos en una sola lista unificada
+  const todosLosProductos = [
+    ...vinilosFormateados,
+    ...productosEquipos,
+    ...productosAccesorios,
+  ];
+
+  // Filtrar según el botón seleccionado
+  const productosFiltrados = categoriaSeleccionada === 'todas'
+    ? todosLosProductos
+    : todosLosProductos.filter((prod) => prod.categoria === categoriaSeleccionada);
+
+  const handleAgregar = (producto) => {
+    if (agregarAlCarrito) {
+      agregarAlCarrito({
+        id: producto.id,
+        nombre: producto.nombre || producto.titulo,
+        precio: producto.precio,
+        imagen: producto.imagen,
+      });
+    }
+
+    setToast(`¡"${producto.nombre || producto.titulo}" se agregó al carrito!`);
+    setTimeout(() => setToast(''), 3000);
+  };
 
   return (
-    <main className="container py-5 text-white">
-      <h1 className="text-uppercase fw-bold text-center mb-4">Categorías</h1>
+    <main className="container py-5 text-white position-relative">
       
+      {/* Toast Notificación Flotante */}
+      {toast && (
+        <div className="position-fixed top-0 end-0 p-3" style={{ zIndex: 1055, marginTop: '70px' }}>
+          <div className="toast show align-items-center text-bg-success border-0 shadow-lg" role="alert">
+            <div className="d-flex">
+              <div className="toast-body fw-bold fs-6">
+                <i className="bi bi-check-circle-fill me-2"></i>
+                {toast}
+              </div>
+              <button 
+                type="button" 
+                className="btn-close btn-close-white me-2 m-auto" 
+                onClick={() => setToast('')}
+              ></button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <h1 className="text-center fw-bold mb-4 text-uppercase">CATEGORÍAS</h1>
+
       {/* Botones de Filtro */}
       <div className="d-flex justify-content-center gap-2 mb-5 flex-wrap">
-        {categorias.map((cat) => (
+        {[
+          { key: 'todas', label: 'Todas' },
+          { key: 'vinilos', label: 'Vinilos' },
+          { key: 'equipos', label: 'Equipos' },
+          { key: 'accesorios', label: 'Accesorios' },
+        ].map((cat) => (
           <button
-            key={cat}
-            onClick={() => setCategoriaSel(cat)}
-            className={`btn fw-bold px-4 ${categoriaSel === cat ? 'btn-danger' : 'btn-outline-light'}`}
+            key={cat.key}
+            onClick={() => setCategoriaSeleccionada(cat.key)}
+            className={`btn fw-bold px-4 ${
+              categoriaSeleccionada === cat.key ? 'btn-danger' : 'btn-outline-light'
+            }`}
           >
-            {cat}
+            {cat.label}
           </button>
         ))}
       </div>
 
-      {/* Grid de Productos Filtrados */}
+      {/* Grid de Productos */}
       <div className="row g-4">
         {productosFiltrados.map((prod) => (
-          <div key={prod.id} className="col-md-4">
-            <div className="card bg-dark text-white border-secondary h-100 shadow-sm">
-              <img src={prod.imagen} alt={prod.nombre} className="card-img-top" style={{ height: '220px', objectFit: 'cover' }} />
-              <div className="card-body d-flex flex-column text-center">
-                <h5 className="fw-bold">{prod.nombre}</h5>
-                <p className="text-danger fw-bold fs-5 mt-auto">$ {prod.precio.toLocaleString('es-CL')}</p>
-                <div className="d-flex gap-2">
-                  <Link to={`/producto/${prod.id}`} className="btn btn-outline-light btn-sm flex-grow-1">Ver Detalle</Link>
-                  <button onClick={() => agregarAlCarrito(prod)} className="btn btn-danger btn-sm flex-grow-1">Añadir</button>
+          <article key={prod.id} className="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div className="card h-100 bg-dark text-white border-secondary shadow-sm">
+              <img
+                src={prod.imagen}
+                className="card-img-top"
+                alt={prod.nombre}
+                style={{ height: '220px', objectFit: 'cover' }}
+              />
+              <div className="card-body d-flex flex-column justify-content-between">
+                <div>
+                  <h2 className="h6 card-title fw-bold text-center mb-2">{prod.nombre}</h2>
+                  <p className="fs-5 fw-bold text-danger text-center mb-3">
+                    $ {prod.precio.toLocaleString('es-CL')}
+                  </p>
+                </div>
+
+                <div className="d-flex gap-2 mt-auto">
+                  <Link
+                    to={`/producto/${prod.id}`}
+                    className="btn btn-outline-light btn-sm flex-fill fw-bold"
+                  >
+                    Ver Detalle
+                  </Link>
+
+                  <button
+                    className="btn btn-danger btn-sm flex-fill fw-bold"
+                    onClick={() => handleAgregar(prod)}
+                  >
+                    Añadir
+                  </button>
                 </div>
               </div>
             </div>
-          </div>
+          </article>
         ))}
       </div>
     </main>
