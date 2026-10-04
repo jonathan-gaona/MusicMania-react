@@ -1,9 +1,8 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { albumes } from '../data/albumesData'; // Importamos la lista de álbumes
 
-// Lista unificada de productos (Catálogo y Equipos)
-const listaTodosLosProductos = [
-  // --- EQUIPOS ---
+const productosEquipos = [
   {
     id: 'eq-1',
     sku: 'AUDIO-MARSHALL-50W',
@@ -44,7 +43,7 @@ const listaTodosLosProductos = [
     id: 'eq-5',
     sku: 'AUDIO-TN-2024',
     nombre: 'Tornamesa Estéreo Retro Hi-Fi',
-    descripcion: 'Reproductor estilo vintage con altavoces integrados, radio FM y velocidad ajustable para vinilos de 33/45/78 RPM. Salida RCA para parlantes externos.',
+    descripcion: 'Reproductor estilo vintage con altavoces integrados, radio FM y velocidad ajustable para vinilos de 33/45/78 RPM.',
     precio: 99990,
     stock: 12,
     imagen: '/img/tocadiscos.jpg',
@@ -58,17 +57,28 @@ const listaTodosLosProductos = [
     stock: 6,
     imagen: '/img/parlante2.jpg',
   }
-  // Agrega aquí los demás productos de tu catálogo si corresponden a esta misma ruta
 ];
 
 export const DetalleProducto = ({ agregarAlCarrito }) => {
-  const { id } = useParams(); // Obtiene el ID dinámico de la URL (/producto/eq-1)
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  // Busca el producto exacto por ID
-  const producto = listaTodosLosProductos.find((item) => String(item.id) === String(id));
+  // Mapeamos los álbumes al formato de producto general para unificar
+  const albumesFormateados = albumes.map((alb) => ({
+    id: alb.id,
+    sku: `VINYL-${alb.id.toUpperCase()}`,
+    nombre: alb.titulo,
+    descripcion: `Álbum original de ${alb.artista} lanzado en el año ${alb.anio}. Formato vinilo de alta fidelidad.`,
+    precio: alb.precio,
+    stock: 10,
+    imagen: alb.imagen,
+    spotifyUrl: alb.spotifyUrl
+  }));
 
-  // Si no se encuentra el producto
+  // Combinamos ambas listas para buscar por ID
+  const todosLosProductos = [...productosEquipos, ...albumesFormateados];
+  const producto = todosLosProductos.find((item) => String(item.id) === String(id));
+
   if (!producto) {
     return (
       <main className="container py-5 text-center text-white">
@@ -82,7 +92,6 @@ export const DetalleProducto = ({ agregarAlCarrito }) => {
 
   return (
     <main className="container py-5 text-white">
-      {/* Botón dinámico que regresa a la vista anterior (Equipos o Catálogo) */}
       <button 
         onClick={() => navigate(-1)} 
         className="btn btn-outline-secondary text-light mb-4"
@@ -102,7 +111,7 @@ export const DetalleProducto = ({ agregarAlCarrito }) => {
           </div>
 
           <div className="col-md-6">
-            <span className="badge bg-danger mb-2">SKU: {producto.sku || 'AUDIO-PROD'}</span>
+            <span className="badge bg-danger mb-2">SKU: {producto.sku}</span>
             <h1 className="fw-bold mb-3">{producto.nombre}</h1>
             <p className="text-white-50 fs-6 mb-4">{producto.descripcion}</p>
 
@@ -110,19 +119,30 @@ export const DetalleProducto = ({ agregarAlCarrito }) => {
               <span className="fs-2 fw-bold text-danger">
                 $ {producto.precio.toLocaleString('es-CL')}
               </span>
-              {producto.stock && (
-                <p className="text-success small mt-1 mb-0">
-                  Stock disponible: {producto.stock} unidades
-                </p>
-              )}
+              <p className="text-success small mt-1 mb-0">
+                Stock disponible: {producto.stock} unidades
+              </p>
             </div>
 
-            <button 
-              className="btn btn-danger btn-lg w-100 fw-bold"
-              onClick={() => agregarAlCarrito(producto)}
-            >
-              Añadir al Carrito
-            </button>
+            <div className="d-flex gap-3">
+              <button 
+                className="btn btn-danger btn-lg flex-fill fw-bold"
+                onClick={() => agregarAlCarrito(producto)}
+              >
+                Añadir al Carrito
+              </button>
+
+              {producto.spotifyUrl && (
+                <a
+                  href={producto.spotifyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline-success btn-lg fw-bold d-flex align-items-center justify-content-center"
+                >
+                  <i className="bi bi-spotify me-2"></i> Escuchar
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </div>

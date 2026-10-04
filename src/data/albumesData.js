@@ -1,6 +1,6 @@
 export const albumes = [
   {
-    id: 1,
+    id: 'alb-1',
     titulo: 'Naturaleza Muerta',
     artista: 'Ley 20 mil',
     anio: 2011,
@@ -9,7 +9,7 @@ export const albumes = [
     spotifyUrl: 'https://open.spotify.com/intl-es/track/42qpPgUmA083IZj4qD3Wzn'
   },
   {
-    id: 2,
+    id: 'alb-2',
     titulo: 'Rap con R de Revolucion',
     artista: 'Portavoz',
     anio: 2012,
@@ -18,7 +18,7 @@ export const albumes = [
     spotifyUrl: 'https://open.spotify.com/intl-es/album/4XvUXpek6UQmjm5ig49yL7?highlight=spotify:track:6vmrsiaeNq7LpiGdvB2bJT'
   },
   {
-    id: 3,
+    id: 'alb-3',
     titulo: 'El Circulo',
     artista: 'Kase.O',
     anio: 2016,
@@ -27,7 +27,7 @@ export const albumes = [
     spotifyUrl: 'https://open.spotify.com/intl-es/album/5k8yhgvK6d0hTI28zIC3NA'
   },
   {
-    id: 4,
+    id: 'alb-4',
     titulo: "Teatro d'ira",
     artista: 'Maneskin',
     anio: 2017,
@@ -36,7 +36,7 @@ export const albumes = [
     spotifyUrl: 'https://open.spotify.com/intl-es/album/7KF1Ain9mYYlg5M46g0i4A'
   },
   {
-    id: 5,
+    id: 'alb-5',
     titulo: 'Off The Wall',
     artista: 'Michael Jackson',
     anio: 1979,
@@ -45,7 +45,7 @@ export const albumes = [
     spotifyUrl: 'https://open.spotify.com/intl-es/album/2ZytN2cY4Zjrr9ukb2rqTP'
   },
   {
-    id: 6,
+    id: 'alb-6',
     titulo: 'The Razors Edge',
     artista: 'AC/DC',
     anio: 1990,
@@ -54,7 +54,7 @@ export const albumes = [
     spotifyUrl: 'https://open.spotify.com/intl-es/album/4vu7F6h90Br1ZtYYaqfITy'
   },
   {
-    id: 7,
+    id: 'alb-7',
     titulo: 'YHLQMDLG',
     artista: 'Bad Bunny',
     anio: 2020,
@@ -63,7 +63,7 @@ export const albumes = [
     spotifyUrl: 'https://open.spotify.com/intl-es/album/5lJqux7orBlA1QzyiBGti1'
   },
   {
-    id: 8,
+    id: 'alb-8',
     titulo: 'The Dark Side Of The Moon',
     artista: 'Pink Floyd',
     anio: 1973,
