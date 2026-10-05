@@ -14,6 +14,7 @@ import { Registro } from './pages/Registro';
 import { Contacto } from './pages/Contacto';
 import { Carrito } from './pages/Carrito';
 import { Resenas } from './pages/Resena';
+import { DetalleResena } from './pages/DetalleResena';
 import { Blog } from './pages/blog';
 import { DetalleBlog } from './pages/DetalleBlog';
 
@@ -72,7 +73,10 @@ const agregarAlCarrito = (producto) => {
           <Route path="/sobre-nosotros" element={<SobreNosotros />} />
           <Route path="/registro" element={<Registro />} />
           <Route path="/contacto" element={<Contacto />} />
+          <Route path="/resena" element={<Resenas />} />
           <Route path="/resenas" element={<Resenas />} />
+          <Route path="/resena/:id" element={<DetalleResena />} />
+          <Route path="/resenas/:id" element={<DetalleResena />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:id" element={<DetalleBlog />} />
 
