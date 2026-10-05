@@ -13,6 +13,10 @@ import { SobreNosotros } from './pages/SobreNosotros';
 import { Registro } from './pages/Registro';
 import { Contacto } from './pages/Contacto';
 import { Carrito } from './pages/Carrito';
+import { Resenas } from './pages/Resena';
+import { Blog } from './pages/blog';
+import { DetalleBlog } from './pages/DetalleBlog';
+
 
 // Nuevas Vistas Públicas según requerimientos del documento
 import { Categorias } from './pages/Categorias';
@@ -68,6 +72,9 @@ const agregarAlCarrito = (producto) => {
           <Route path="/sobre-nosotros" element={<SobreNosotros />} />
           <Route path="/registro" element={<Registro />} />
           <Route path="/contacto" element={<Contacto />} />
+          <Route path="/resenas" element={<Resenas />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<DetalleBlog />} />
 
           {/* Nuevas vistas requeridas por la pauta */}
           <Route path="/categorias" element={<Categorias agregarAlCarrito={agregarAlCarrito} />} />
