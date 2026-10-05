@@ -22,7 +22,11 @@ export const Registro = () => {
   });
 
   const [errores, setErrores] = useState({});
-  const [mostrarToast, setMostrarToast] = useState(false);
+  const [toastState, setToastState] = useState({
+    visible: false,
+    tipo: 'exito', // 'exito' o 'error'
+    mensaje: ''
+  });
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -38,6 +42,13 @@ export const Registro = () => {
         [id]: value
       }));
     }
+  };
+
+  const mostrarToast = (tipo, mensaje) => {
+    setToastState({ visible: true, tipo, mensaje });
+    setTimeout(() => {
+      setToastState((prev) => ({ ...prev, visible: false }));
+    }, 4000);
   };
 
   const validarFormulario = () => {
@@ -65,15 +76,15 @@ export const Registro = () => {
       nuevosErrores.apellidos = 'Los apellidos solo deben contener letras.';
     }
 
-    // 3. Correo permitido
-    const correoRegex = /^[a-zA-Z0-9._%+-]+@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/i;
+    // 3. Correo permitido (@duoc.cl, @profesor.duoc.cl, @gmail.com)
+    const correoRegex = /^[\w-\.]+@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/i;
     if (!formData.correo.trim()) {
       nuevosErrores.correo = 'El correo es obligatorio.';
     } else if (!correoRegex.test(formData.correo.trim())) {
       nuevosErrores.correo = 'Solo se permiten correos @duoc.cl, @profesor.duoc.cl o @gmail.com.';
     }
 
-    // 4. Contraseña
+    // 4. Contraseña entre 4 y 10 caracteres
     if (formData.password.length < 4 || formData.password.length > 10) {
       nuevosErrores.password = 'La contraseña debe tener entre 4 y 10 caracteres.';
     }
@@ -93,38 +104,82 @@ export const Registro = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validarFormulario()) {
-      setMostrarToast(true);
 
-      // Cierra automáticamente el Toast a los 4 segundos
-      setTimeout(() => {
-        setMostrarToast(false);
-      }, 4000);
+    if (validarFormulario()) {
+      // Leer usuarios guardados en localStorage
+      const usuariosActuales = JSON.parse(localStorage.getItem('usuariosApp')) || [];
+
+      // Verificar si el correo ya existe
+      const correoExiste = usuariosActuales.some(
+        (u) => u.correo.toLowerCase() === formData.correo.trim().toLowerCase()
+      );
+
+      if (correoExiste) {
+        mostrarToast('error', 'El correo ya se encuentra registrado.');
+        return;
+      }
+
+      // Crear objeto del nuevo usuario Cliente
+      const nuevoCliente = {
+        run: formData.run.trim(),
+        nombre: `${formData.nombre.trim()} ${formData.apellidos.trim()}`,
+        correo: formData.correo.trim(),
+        password: formData.password.trim(),
+        region: formData.region,
+        comuna: formData.comuna,
+        direccion: formData.direccion.trim(),
+        rol: 'Cliente' // Rol por defecto
+      };
+
+      // Guardar en localStorage
+      usuariosActuales.push(nuevoCliente);
+      localStorage.setItem('usuariosApp', JSON.stringify(usuariosActuales));
+
+      // Mostrar mensaje de éxito
+      mostrarToast('exito', 'Usuario creado correctamente');
+
+      // Vaciar formulario y limpiar errores
+      setFormData({
+        run: '',
+        nombre: '',
+        apellidos: '',
+        correo: '',
+        password: '',
+        confirmPassword: '',
+        region: '',
+        comuna: '',
+        direccion: ''
+      });
+      setErrores({});
+    } else {
+      mostrarToast('error', 'El usuario no se pudo crear');
     }
   };
 
   return (
     <main className="bg-dark text-white min-vh-100 py-5 position-relative">
       
-      {/* MENSAGE TOAST ESTILO MUSICMANIA (MODERNO Y OSCURO) */}
-      {mostrarToast && (
-        <div className="toast-container position-fixed bottom-0 end-0 p-3" style={{ zIndex: 1100 }}>
-          <div className="toast show bg-dark text-white border border-danger shadow-lg" role="alert">
-            <div className="toast-header bg-danger text-white">
-              <strong className="me-auto">🎉 MusicMania</strong>
-              <small className="text-white-50">Ahora mismo</small>
-              <button
-                type="button"
-                className="btn-close btn-close-white"
-                onClick={() => setMostrarToast(false)}
-              ></button>
+      {/* TOAST DE NOTIFICACIÓN COMPACTO */}
+      {toastState.visible && (
+        <div className="position-fixed top-0 end-0 p-3" style={{ zIndex: 1100, marginTop: '70px' }}>
+          <div
+            className={`d-flex align-items-center justify-content-between p-3 rounded-3 shadow-lg ${
+              toastState.tipo === 'exito' ? 'bg-success text-white' : 'bg-warning text-dark'
+            }`}
+            style={{ minWidth: '300px', maxWidth: '380px' }}
+            role="alert"
+          >
+            <div className="d-flex align-items-center me-2">
+              <span className="fs-5 me-2 fw-bold">
+                {toastState.tipo === 'exito' ? '✔' : '⚠️'}
+              </span>
+              <span className="fw-semibold small">{toastState.mensaje}</span>
             </div>
-            <div className="toast-body bg-dark text-white p-3">
-              <p className="fw-bold mb-1 text-danger">¡Usuario registrado con éxito!</p>
-              <small className="text-white-50">
-                Tu cuenta ha sido creada correctamente. Ya puedes iniciar sesión para disfrutar de la mejor música.
-              </small>
-            </div>
+            <button
+              type="button"
+              className={`btn-close ${toastState.tipo === 'exito' ? 'btn-close-white' : ''}`}
+              onClick={() => setToastState((prev) => ({ ...prev, visible: false }))}
+            ></button>
           </div>
         </div>
       )}

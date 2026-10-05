@@ -17,6 +17,7 @@ import { Resenas } from './pages/Resena';
 import { DetalleResena } from './pages/DetalleResena';
 import { Blog } from './pages/blog';
 import { DetalleBlog } from './pages/DetalleBlog';
+import { IniciarSesion } from './pages/IniciarSesion';
 
 
 // Nuevas Vistas Públicas según requerimientos del documento
@@ -79,6 +80,7 @@ const agregarAlCarrito = (producto) => {
           <Route path="/resenas/:id" element={<DetalleResena />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:id" element={<DetalleBlog />} />
+          <Route path="/iniciar-sesion" element={<IniciarSesion />} />
 
           {/* Nuevas vistas requeridas por la pauta */}
           <Route path="/categorias" element={<Categorias agregarAlCarrito={agregarAlCarrito} />} />
