@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const ofertasData = [
   { id: 101, nombre: 'Tornamesa Retro Vintage', precioAntes: 120000, precioOferta: 89990, imagen: '/img/tocadiscos.jpg', descuento: '25% OFF' },
-  { id: 102, nombre: 'Pack 3 LPs Rock Clásico', precioAntes: 75000, precioOferta: 59990, imagen: '/img/vinilos.jpg', descuento: '20% OFF' }
+  { id: 102, nombre: 'Parlante de P.A. Profesional', precioAntes: 199990, precioOferta: 159.992, imagen: '/img/parlantejbl.jpg', descuento: '20% OFF' }
 ];
 
 export const Ofertas = ({ agregarAlCarrito }) => {
