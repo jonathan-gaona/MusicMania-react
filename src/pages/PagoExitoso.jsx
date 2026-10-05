@@ -9,8 +9,8 @@ export const PagoExitoso = ({ orden }) => {
       <div className="card bg-dark border-success p-5 max-w-lg mx-auto shadow-lg">
         <i className="bi bi-check-circle-fill text-success display-1 mb-3"></i>
         <h1 className="fw-bold text-success">¡PAGO REALIZADO CON ÉXITO!</h1>
-        <p className="fs-5">Código de orden: <strong className="text-warning">{orden.nroOrden}</strong></p>
-        <p className="text-white-50">Enviaremos un correo de confirmación a: <strong>{orden.cliente.correo}</strong></p>
+        <p className="text-white -5">Código de orden: <strong className="text-warning">{orden.nroOrden}</strong></p>
+        <p className="text-white -5">Enviaremos un correo de confirmación a: <strong>{orden.cliente.correo}</strong></p>
         
         <div className="bg-secondary p-3 rounded text-start my-4">
           <p className="mb-1"><strong>Despachar a:</strong> {orden.cliente.calle}, {orden.cliente.comuna}</p>
