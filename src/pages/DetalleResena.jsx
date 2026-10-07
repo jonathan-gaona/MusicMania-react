@@ -1,32 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { resenasData } from './Resena';
-import usuariosData from '../data/usuarios.json';
 import initialResenasComunidad from '../data/resenasComunidad.json';
 
 export const DetalleResena = () => {
   const { id } = useParams();
   const reseña = resenasData.find((item) => item.id === id);
 
+  // Reseñas comunitarias en localStorage
   const [todasLasResenas, setTodasLasResenas] = useState(() => {
     const guardadas = localStorage.getItem('resenasComunidad');
     return guardadas ? JSON.parse(guardadas) : initialResenasComunidad;
   });
 
+  // Sesión y Usuarios desde localStorage
   const [usuarioSesion, setUsuarioSesion] = useState(null);
-  const [nuevoUsuarioId, setNuevoUsuarioId] = useState(usuariosData[0]?.id || '');
+  const [clientesDisponibles, setClientesDisponibles] = useState([]);
+  const [nuevoUsuarioCorreo, setNuevoUsuarioCorreo] = useState('');
+
+  // Formulario
   const [nuevaPuntuacion, setNuevaPuntuacion] = useState('10');
   const [nuevoComentario, setNuevoComentario] = useState('');
 
-  // Estado para controlar la diapositiva actual del carrusel de forma nativa en React
+  // Carrusel Nativo
   const [indexCarrusel, setIndexCarrusel] = useState(0);
 
   useEffect(() => {
-    const usuarioGuardado = localStorage.getItem('usuarioActivo');
-    if (usuarioGuardado) {
-      const parsedUser = JSON.parse(usuarioGuardado);
-      setUsuarioSesion(parsedUser);
-      setNuevoUsuarioId(parsedUser.id);
+    // 1. Obtener la sesión activa
+    const sesionActiva = JSON.parse(localStorage.getItem('usuarioSesion'));
+    if (sesionActiva) {
+      setUsuarioSesion(sesionActiva);
+      setNuevoUsuarioCorreo(sesionActiva.correo);
+    }
+
+    // 2. Obtener usuarios registrados y filtrar al Administrador
+    const usuariosApp = JSON.parse(localStorage.getItem('usuariosApp')) || [];
+    const soloClientes = usuariosApp.filter((u) => u.rol !== 'Administrador');
+    setClientesDisponibles(soloClientes);
+
+    if (!sesionActiva && soloClientes.length > 0) {
+      setNuevoUsuarioCorreo(soloClientes[0].correo);
     }
   }, []);
 
@@ -48,7 +61,7 @@ export const DetalleResena = () => {
     ? (comunidadResenasAlbum.reduce((acc, item) => acc + Number(item.puntuacion), 0) / comunidadResenasAlbum.length).toFixed(1)
     : 'N/A';
 
-  // Controladores del Carrusel Nativo
+  // Controles del Carrusel
   const handleAnterior = () => {
     setIndexCarrusel((prev) => (prev === 0 ? comunidadResenasAlbum.length - 1 : prev - 1));
   };
@@ -57,16 +70,25 @@ export const DetalleResena = () => {
     setIndexCarrusel((prev) => (prev === comunidadResenasAlbum.length - 1 ? 0 : prev + 1));
   };
 
+  // Guardar nueva reseña
   const handleAgregarResena = (e) => {
     e.preventDefault();
     if (!nuevoComentario.trim()) return;
 
-    const idUsuarioAFirma = usuarioSesion ? usuarioSesion.id : nuevoUsuarioId;
+    const usuariosApp = JSON.parse(localStorage.getItem('usuariosApp')) || [];
+    const correoFirma = usuarioSesion ? usuarioSesion.correo : nuevoUsuarioCorreo;
+    const datosUsuario = usuariosApp.find((u) => u.correo === correoFirma) || {
+      nombre: usuarioSesion ? usuarioSesion.nombre : 'Cliente Ejemplo',
+      correo: correoFirma,
+      rol: 'Cliente'
+    };
 
     const nuevaResenaObj = {
       id: Date.now(),
       albumId: reseña.id,
-      usuarioId: idUsuarioAFirma,
+      usuarioCorreo: datosUsuario.correo,
+      usuarioNombre: datosUsuario.nombre,
+      usuarioRol: datosUsuario.rol,
       puntuacion: Number(nuevaPuntuacion),
       comentario: nuevoComentario,
       fecha: new Date().toISOString().split('T')[0]
@@ -76,10 +98,9 @@ export const DetalleResena = () => {
     setTodasLasResenas(listaActualizada);
     localStorage.setItem('resenasComunidad', JSON.stringify(listaActualizada));
     setNuevoComentario('');
-    setIndexCarrusel(0); // Mostrar la reseña recién publicada de primero
+    setIndexCarrusel(0);
   };
 
-  // Asegurar que el índice no quede fuera de rango si cambian las reseñas
   const safeIndex = indexCarrusel >= comunidadResenasAlbum.length ? 0 : indexCarrusel;
 
   return (
@@ -124,7 +145,7 @@ export const DetalleResena = () => {
                 </div>
               )}
 
-              {/* DUAL RATING BOXES */}
+              {/* CALIFICACIONES DUALES */}
               <div className="d-flex flex-wrap gap-3 mt-3">
                 <div className="p-3 bg-dark rounded border border-danger flex-fill">
                   <span className="text-secondary small d-block text-uppercase fw-bold">Calificación Crítica</span>
@@ -154,7 +175,7 @@ export const DetalleResena = () => {
           </div>
         </article>
 
-        {/* SECCIÓN DE RESEÑAS DE LA COMUNIDAD */}
+        {/* SECCIÓN RESEÑAS DE LA COMUNIDAD */}
         <section className="bg-secondary bg-opacity-10 p-4 p-md-5 rounded shadow border border-secondary">
           <h3 className="fw-bold text-uppercase mb-4">Reseñas de la Comunidad</h3>
 
@@ -164,26 +185,26 @@ export const DetalleResena = () => {
 
             {usuarioSesion ? (
               <div className="alert alert-info py-2 small mb-3">
-                Sesión activa: <strong>{usuarioSesion.nombre}</strong> ({usuarioSesion.rol})
+                Sesión activa: <strong>{usuarioSesion.nombre}</strong> ({usuarioSesion.correo})
               </div>
             ) : (
               <div className="alert alert-warning py-2 small mb-3">
-                No has iniciado sesión. <Link to="/login" className="alert-link">Inicia sesión</Link> o elige un usuario para firmar la reseña.
+                No has iniciado sesión. <Link to="/iniciar-sesion" className="alert-link">Inicia sesión</Link> o selecciona un cliente de la lista.
               </div>
             )}
             
             <div className="row g-3 mb-3">
               {!usuarioSesion && (
                 <div className="col-md-6">
-                  <label className="form-label text-secondary small">Seleccionar Usuario (JSON):</label>
+                  <label className="form-label text-secondary small">Seleccionar Cliente (localStorage):</label>
                   <select
                     className="form-select bg-dark text-light border-secondary"
-                    value={nuevoUsuarioId}
-                    onChange={(e) => setNuevoUsuarioId(e.target.value)}
+                    value={nuevoUsuarioCorreo}
+                    onChange={(e) => setNuevoUsuarioCorreo(e.target.value)}
                   >
-                    {usuariosData.map((user) => (
-                      <option key={user.id} value={user.id}>
-                        {user.nombre} ({user.rol})
+                    {clientesDisponibles.map((user) => (
+                      <option key={user.correo} value={user.correo}>
+                        {user.nombre} ({user.correo})
                       </option>
                     ))}
                   </select>
@@ -216,37 +237,34 @@ export const DetalleResena = () => {
               ></textarea>
             </div>
 
-            <button type="submit" className="btn btn-info fw-bold text-uppercase">
+            <button type="submit" className="btn btn-danger fw-bold text-uppercase">
               Publicar Reseña
             </button>
           </form>
 
-          {/* CARRUSEL DE RESEÑAS CONTROLADO POR REACT */}
+          {/* CARRUSEL DE RESEÑAS */}
           {comunidadResenasAlbum.length > 0 ? (
             <div className="position-relative bg-dark rounded border border-secondary p-3 p-md-4 shadow">
               {comunidadResenasAlbum.map((item, index) => {
                 if (index !== safeIndex) return null;
 
-                const usuario = usuariosData.find((u) => u.id === item.usuarioId) || {
-                  nombre: 'Usuario Registrado',
-                  avatar: 'https://i.pravatar.cc/150?img=3',
-                  rol: 'Comunidad'
-                };
+                const nombreMostrar = item.usuarioNombre || 'Cliente Ejemplo';
+                const rolMostrar = item.usuarioRol || 'Cliente';
 
                 return (
                   <div key={item.id} className="d-flex flex-column align-items-center text-center p-3 px-md-5">
-                    <img
-                      src={usuario.avatar}
-                      alt={usuario.nombre}
-                      className="rounded-circle mb-3 shadow border border-info"
-                      style={{ width: '70px', height: '70px', objectFit: 'cover' }}
-                    />
-                    <h5 className="mb-0 text-light fw-bold">{usuario.nombre}</h5>
+                    <div
+                      className="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center fw-bold fs-4 mb-3 border border-light"
+                      style={{ width: '70px', height: '70px' }}
+                    >
+                      {nombreMostrar.charAt(0).toUpperCase()}
+                    </div>
+                    <h5 className="mb-0 text-light fw-bold">{nombreMostrar}</h5>
                     <span className="badge bg-secondary text-uppercase mb-2" style={{ fontSize: '0.75rem' }}>
-                      {usuario.rol}
+                      {rolMostrar}
                     </span>
 
-                    <div className="badge bg-info text-dark fw-bold mb-3 fs-6 px-3 py-2">
+                    <div className="badge bg-danger text-white fw-bold mb-3 fs-6 px-3 py-2">
                       ★ {item.puntuacion} / 10 Puntos
                     </div>
 
@@ -258,7 +276,7 @@ export const DetalleResena = () => {
                 );
               })}
 
-              {/* Botones de navegación con eventos onClick de React */}
+              {/* Botones de navegación */}
               {comunidadResenasAlbum.length > 1 && (
                 <>
                   <button
