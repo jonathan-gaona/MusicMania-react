@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 // Importación de componentes globales
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
+
 
 // Vistas que ya tenías en tu proyecto
 import { Home } from './pages/Home';
