@@ -34,6 +34,13 @@ export const IniciarSesion = () => {
           correo: 'cliente@gmail.com',
           password: '1234',
           rol: 'Cliente'
+        },
+        {
+          nombre: 'Cliente Ejemplo 2',
+          run: '33333333',
+          correo: 'cliente2@gmail.com',
+          password: '1234',
+          rol: 'Cliente'
         }
       ];
       localStorage.setItem('usuariosApp', JSON.stringify(usuariosBase));

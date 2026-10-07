@@ -132,19 +132,6 @@ export const DetalleResena = () => {
                 <div>Precio: <strong>${reseña.precio ? reseña.precio.toLocaleString('es-CL') : 'N/A'}</strong></div>
               </div>
 
-              {reseña.spotifyUrl && (
-                <div className="mb-3">
-                  <a
-                    href={reseña.spotifyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-sm btn-outline-success fw-bold text-uppercase"
-                  >
-                    <i className="bi bi-spotify me-1"></i> Escuchar en Spotify
-                  </a>
-                </div>
-              )}
-
               {/* CALIFICACIONES DUALES */}
               <div className="d-flex flex-wrap gap-3 mt-3">
                 <div className="p-3 bg-dark rounded border border-danger flex-fill">

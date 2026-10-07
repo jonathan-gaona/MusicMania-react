@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import initialResenasComunidad from '../data/resenasComunidad.json';
 
 export const resenasData = [
   {
@@ -9,7 +10,6 @@ export const resenasData = [
     anio: 2011,
     precio: 17990,
     imagen: '/img/Ley20mil.jpg',
-    spotifyUrl: 'https://open.spotify.com/intl-es/track/42qpPgUmA083IZj4qD3Wzn',
     genero: 'Hip-Hop / Boom Bap',
     calificacion: '9.2 / 10',
     description: 'Naturaleza Muerta (2011) es el álbum debut y obra de culto del grupo chileno Ley 20mil (Macrodee y Linterna Veiderr junto a DJ Jotakao). Producido casi en su totalidad por Macrodee bajo Demencia Estudio, el disco consta de 20 tracks con un sonido boom bap oscuro y pesado.',
@@ -27,7 +27,6 @@ export const resenasData = [
     anio: 2012,
     precio: 14990,
     imagen: '/img/RdeRevolucion.jpg',
-    spotifyUrl: 'https://open.spotify.com/intl-es/album/4XvUXpek6UQmjm5ig49yL7?highlight=spotify:track:6vmrsiaeNq7LpiGdvB2bJT',
     genero: 'Hip-Hop Político / Consciente',
     calificacion: '9.5 / 10',
     description: 'Rap con R de Revolución es el álbum debut como solista del rapero chileno Portavoz (Andrés Kooper, integrante de Salvaje Decibel). Producido por el propio Portavoz junto a Beatmaker B-Souldier, el disco es un referente del rap político latinoamericano.',
@@ -45,7 +44,6 @@ export const resenasData = [
     anio: 2016,
     precio: 19990,
     imagen: '/img/Elcirculo.jpg',
-    spotifyUrl: 'https://open.spotify.com/intl-es/album/5k8yhgvK6d0hTI28zIC3NA',
     genero: 'Hip-Hop / Jazz Rap / Soul',
     calificacion: '9.8 / 10',
     description: 'El Círculo (2016) es el esperado y único álbum de estudio en solitario del legendario rapero español Kase.O (Javier Ibarra, miembro de Violadores del Verso). Una obra maestra introspectiva e íntima donde aborda la depresión, el amor y la espiritualidad.',
@@ -63,7 +61,6 @@ export const resenasData = [
     anio: 2017,
     precio: 13990,
     imagen: '/img/maneskin.jpg',
-    spotifyUrl: 'https://open.spotify.com/intl-es/album/7KF1Ain9mYYlg5M46g0i4A',
     genero: 'Hard Rock / Glam Rock / Punk',
     calificacion: '8.7 / 10',
     description: "Teatro d'ira es una producción donde la banda de rock italiana Måneskin fusiona el hard rock, el funk rock y el punk, abordando temáticas como la rabia transformadora, la catarsis, la libertad de expresión y el inconformismo.",
@@ -81,7 +78,6 @@ export const resenasData = [
     anio: 1979,
     precio: 12990,
     imagen: '/img/michaelJackson.webp',
-    spotifyUrl: 'https://open.spotify.com/intl-es/album/2ZytN2cY4Zjrr9ukb2rqTP',
     genero: 'Disco / Pop / Funk / R&B',
     calificacion: '10 / 10',
     description: 'Off the Wall (1979) es el quinto álbum de estudio del cantante estadounidense Michael Jackson. Producido por Quincy Jones, el disco marcó la transición de Michael hacia una sofisticada fusión de disco, funk, pop y baladas R&B.',
@@ -99,7 +95,6 @@ export const resenasData = [
     anio: 1990,
     precio: 9990,
     imagen: '/img/acdc.jpg',
-    spotifyUrl: 'https://open.spotify.com/intl-es/album/4vu7F6h90Br1ZtYYaqfITy',
     genero: 'Hard Rock / Heavy Metal',
     calificacion: '9.0 / 10',
     description: 'The Razors Edge (1990) es el decimosegundo álbum de estudio de la banda australiana de hard rock AC/DC. Producido por Bruce Fairbairn, significó un masivo retorno a las listas de éxitos mundiales gracias a sencillos legendarios como "Thunderstruck".',
@@ -117,7 +112,6 @@ export const resenasData = [
     anio: 2020,
     precio: 13990,
     imagen: '/img/badbunny.webp',
-    spotifyUrl: 'https://open.spotify.com/intl-es/album/5lJqux7orBlA1QzyiBGti1',
     genero: 'Reggaetón / Trap Latino / Synthwave',
     calificacion: '9.1 / 10',
     description: 'YHLQMDLG (acrónimo de "Yo Hago Lo Que Me Da La Gana", 2020) es el segundo álbum de estudio en solitario del puertorriqueño Bad Bunny. Un homenaje a las perreadas de marquesina de los años 2000 que mezcla trap, synthwave y dancehall.',
@@ -135,7 +129,6 @@ export const resenasData = [
     anio: 1973,
     precio: 15990,
     imagen: '/img/pinkfloyd.png',
-    spotifyUrl: 'https://open.spotify.com/intl-es/album/4LH4d3cOWNNsVw41Gqt2kv',
     genero: 'Rock Progresivo / Psicodélico',
     calificacion: '10 / 10',
     description: 'The Dark Side of the Moon (1973) es el octavo álbum de estudio de Pink Floyd. Un álbum conceptual monumental que explora temas existenciales como el paso del tiempo, la codicia, el conflicto mental y la muerte.',
@@ -149,6 +142,12 @@ export const resenasData = [
 ];
 
 export const Resenas = () => {
+  // Cargar reseñas comunitarias desde localStorage o JSON inicial
+  const [todasLasResenas] = useState(() => {
+    const guardadas = localStorage.getItem('resenasComunidad');
+    return guardadas ? JSON.parse(guardadas) : initialResenasComunidad;
+  });
+
   return (
     <main className="py-5 bg-dark text-light">
       <section className="text-center mb-5">
@@ -158,59 +157,84 @@ export const Resenas = () => {
 
       <section className="container">
         <div className="row g-4">
-          {resenasData.map((item) => (
-            <div key={item.id} className="col-12 col-md-6">
-              <div className="bg-secondary bg-opacity-10 p-4 rounded shadow border border-secondary h-100 d-flex flex-column justify-content-between">
-                <div>
-                  <div className="row g-3 align-items-center mb-3">
-                    <div className="col-4">
-                      <img
-                        src={item.imagen}
-                        alt={item.titulo}
-                        className="img-fluid rounded border border-secondary shadow-sm"
-                        style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover' }}
-                      />
-                    </div>
-                    <div className="col-8">
-                      <span className="badge bg-danger text-uppercase mb-1">{item.genero}</span>
-                      <h4 className="fw-bold text-uppercase mb-1">{item.titulo}</h4>
-                      <h6 className="text-danger fw-bold mb-2">{item.artista} ({item.anio})</h6>
-                      <div className="d-flex align-items-center gap-2">
-                        <span className="badge bg-dark border border-warning text-warning">
-                          ★ {item.calificacion}
-                        </span>
-                        <span className="badge bg-success text-light">
-                          ${item.precio.toLocaleString('es-CL')}
-                        </span>
+          {resenasData.map((item) => {
+            // Filtrar y calcular promedio de la comunidad por cada álbum
+            const comunidadResenasAlbum = todasLasResenas.filter(
+              (resena) => resena.albumId === item.id
+            );
+
+            const promedioComunidad =
+              comunidadResenasAlbum.length > 0
+                ? (
+                    comunidadResenasAlbum.reduce((acc, r) => acc + Number(r.puntuacion), 0) /
+                    comunidadResenasAlbum.length
+                  ).toFixed(1)
+                : 'N/A';
+
+            return (
+              <div key={item.id} className="col-12 col-md-6">
+                <div className="bg-secondary bg-opacity-10 p-4 rounded shadow border border-secondary h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <div className="row g-3 align-items-center mb-3">
+                      <div className="col-4">
+                        <img
+                          src={item.imagen}
+                          alt={item.titulo}
+                          className="img-fluid rounded border border-secondary shadow-sm"
+                          style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover' }}
+                        />
+                      </div>
+                      <div className="col-8">
+                        <span className="badge bg-danger text-uppercase mb-1">{item.genero}</span>
+                        <h4 className="fw-bold text-uppercase mb-1">{item.titulo}</h4>
+                        <h6 className="text-danger fw-bold mb-2">
+                          {item.artista} ({item.anio})
+                        </h6>
+
+                        {/* CALIFICACIONES COMPARTIDAS (CRÍTICA Y COMUNIDAD) */}
+                        <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
+                          <span className="badge bg-dark border border-warning text-warning" title="Calificación Crítica">
+                            ★ Crítica: {item.calificacion}
+                          </span>
+                          <span className="badge bg-dark border border-info text-info" title="Calificación Comunidad">
+                            ♥ Comunidad: {promedioComunidad} / 10
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className="badge bg-success text-light">
+                            ${item.precio ? item.precio.toLocaleString('es-CL') : '0'}
+                          </span>
+                        </div>
                       </div>
                     </div>
+
+                    <p className="text-secondary small mb-4">{item.description}</p>
                   </div>
 
-                  <p className="text-secondary small mb-4">{item.description}</p>
-                </div>
-
-                <div className="d-flex flex-column gap-2">
-                  <Link
-                    to={`/resena/${item.id}`}
-                    className="btn btn-outline-light w-100 fw-bold text-uppercase py-2"
-                  >
-                    Leer Reseña Crítica Completa <i className="bi bi-arrow-right ms-1"></i>
-                  </Link>
-
-                  {item.spotifyUrl && (
-                    <a
-                      href={item.spotifyUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-sm btn-outline-success w-100 fw-bold text-uppercase"
+                  <div className="d-flex flex-column gap-2">
+                    <Link
+                      to={`/resena/${item.id}`}
+                      className="btn btn-outline-light w-100 fw-bold text-uppercase py-2"
                     >
-                      <i className="bi bi-spotify me-1"></i> Escuchar en Spotify
-                    </a>
-                  )}
+                      Leer Reseña Crítica Completa <i className="bi bi-arrow-right ms-1"></i>
+                    </Link>
+
+                    {item.spotifyUrl && (
+                      <a
+                        href={item.spotifyUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-sm btn-outline-success w-100 fw-bold text-uppercase"
+                      >
+                        <i className="bi bi-spotify me-1"></i> Escuchar en Spotify
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
     </main>
