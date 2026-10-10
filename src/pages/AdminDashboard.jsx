@@ -2,16 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminNavbar } from '../components/AdminNavbar';
 import { AdminUsuarios } from './AdminUsuarios';
+import { AdminOrdenes } from './AdminOrdenes';
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
   const [usuarioSesion, setUsuarioSesion] = useState(null);
   const [cargando, setCargando] = useState(true);
   
-  // 1. ESTADO PARA CONTROLAR LA PESTAÑA ACTIVA
+  // ESTADO DE NAVEGACIÓN
   const [tabActiva, setTabActiva] = useState('dashboard');
 
-  // VERIFICACIÓN DE PERMISOS
+  // ESTADO PARA MÉTRICAS DE USUARIOS DESDE LOCALSTORAGE
+  const [metricasUsuarios, setMetricasUsuarios] = useState({
+    total: 0,
+    clientes: 0,
+    admins: 0
+  });
+
+  // VERIFICACIÓN DE PERMISOS Y CARGA DE DATOS
   useEffect(() => {
     const sesionGuardada = localStorage.getItem('usuarioSesion');
 
@@ -34,6 +42,26 @@ export const AdminDashboard = () => {
     }
   }, [navigate]);
 
+  // CARGAR / ACTUALIZAR MÉTRICAS DE USUARIOS
+  const actualizarMetricasUsuarios = () => {
+    const usuariosGuardados = JSON.parse(localStorage.getItem('usuariosApp')) || [];
+    const clientes = usuariosGuardados.filter((u) => u.rol === 'Cliente').length;
+    const admins = usuariosGuardados.filter((u) => u.rol === 'Administrador').length;
+
+    setMetricasUsuarios({
+      total: usuariosGuardados.length,
+      clientes,
+      admins
+    });
+  };
+
+  // Re-calcular métricas al cargar y cada vez que se vuelve al Dashboard
+  useEffect(() => {
+    if (!cargando) {
+      actualizarMetricasUsuarios();
+    }
+  }, [cargando, tabActiva]);
+
   if (cargando) {
     return (
       <div className="bg-dark text-light min-vh-100 d-flex flex-column justify-content-center align-items-center">
@@ -45,7 +73,7 @@ export const AdminDashboard = () => {
 
   return (
     <div className="bg-dark text-light min-vh-100 d-flex flex-column">
-      {/* NAVBAR DEDICADA DE ADMINISTRADOR */}
+      {/* NAVBAR DE ADMINISTRADOR */}
       <AdminNavbar usuarioSesion={usuarioSesion} />
 
       <div className="d-flex flex-grow-1">
@@ -91,7 +119,6 @@ export const AdminDashboard = () => {
               <i className="bi bi-tags"></i> Categorías
             </button>
 
-            {/* BOTÓN USUARIOS */}
             <button
               onClick={() => setTabActiva('usuarios')}
               className={`nav-link text-start d-flex align-items-center gap-2 py-2 px-3 fw-semibold rounded ${
@@ -112,7 +139,7 @@ export const AdminDashboard = () => {
           </nav>
         </aside>
 
-        {/* CONTENIDO PRINCIPAL DINÁMICO */}
+        {/* CONTENIDO PRINCIPAL */}
         <main className="flex-grow-1 p-4 p-md-5 overflow-auto">
           
           {/* VISTA 1: DASHBOARD PRINCIPAL */}
@@ -150,9 +177,11 @@ export const AdminDashboard = () => {
                 <div className="col-12 col-md-4">
                   <div className="bg-warning bg-opacity-20 border border-warning p-4 rounded-3 shadow d-flex align-items-center justify-content-between">
                     <div>
-                      <span className="text-uppercase fs-7 fw-bold text-warning">Usuarios</span>
-                      <h3 className="display-6 fw-bold my-1">890</h3>
-                      <small className="text-light opacity-75">Nuevos usuarios este mes: <strong>120</strong></small>
+                      <span className="text-uppercase fs-7 fw-bold text-warning">Usuarios Registrados</span>
+                      <h3 className="display-6 fw-bold my-1">{metricasUsuarios.total}</h3>
+                      <small className="text-light opacity-75">
+                        <strong>{metricasUsuarios.clientes}</strong> Clientes | <strong>{metricasUsuarios.admins}</strong> Admins
+                      </small>
                     </div>
                     <i className="bi bi-people fs-1 text-warning"></i>
                   </div>
@@ -168,7 +197,7 @@ export const AdminDashboard = () => {
                     { id: 'ordenes', title: 'Órdenes', desc: 'Gestión y seguimiento de órdenes.', icon: 'bi-receipt', color: 'text-info' },
                     { id: 'productos', title: 'Productos', desc: 'Administrar inventario y catálogo.', icon: 'bi-disc', color: 'text-success' },
                     { id: 'categorias', title: 'Categorías', desc: 'Organizar productos por géneros.', icon: 'bi-tags', color: 'text-warning' },
-                    { id: 'usuarios', title: 'Usuarios', desc: 'Gestión de cuentas y roles.', icon: 'bi-people', color: 'text-primary' },
+                    { id: 'usuarios', title: 'Usuarios', desc: `Gestión de ${metricasUsuarios.total} cuentas activas.`, icon: 'bi-people', color: 'text-primary' },
                     { id: 'reportes', title: 'Reportes', desc: 'Generación de informes detallados.', icon: 'bi-bar-chart-line', color: 'text-danger' }
                   ].map((mod) => (
                     <div key={mod.id} className="col-12 col-md-6 col-lg-4">
@@ -191,8 +220,11 @@ export const AdminDashboard = () => {
           {/* VISTA 2: COMPONENTE DE USUARIOS */}
           {tabActiva === 'usuarios' && <AdminUsuarios />}
 
-          {/* MENSAJE TEMPORAL PARA OTRAS PESTAÑAS */}
-          {['ordenes', 'productos', 'categorias', 'reportes'].includes(tabActiva) && (
+          {/* VISTA 3: COMPONENTE DE ÓRDENES */}
+          {tabActiva === 'ordenes' && <AdminOrdenes />}
+
+          {/* MENSAJE TEMPORAL PARA MÓDULOS PENDIENTES */}
+          {['productos', 'categorias', 'reportes'].includes(tabActiva) && (
             <div className="text-center py-5 bg-secondary bg-opacity-10 rounded border border-secondary">
               <i className="bi bi-gear fs-1 text-warning mb-3 d-block"></i>
               <h4 className="fw-bold text-uppercase">Módulo de {tabActiva}</h4>

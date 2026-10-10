@@ -21,7 +21,7 @@ export const AdminUsuarios = () => {
   });
   const [errorForm, setErrorForm] = useState('');
 
-  // CARGAR USUARIOS DESDE LOCALSTORAGE (Sin datos duplicados)
+  // CARGAR USUARIOS DESDE LOCALSTORAGE
   useEffect(() => {
     cargarUsuarios();
   }, []);
@@ -132,12 +132,12 @@ export const AdminUsuarios = () => {
     return coincideBusqueda && coincideRol;
   });
 
-  // HISTORIAL SIMULADO DE COMPRAS (SOLO PARA CLIENTES)
-  const obtenerHistorialSimulado = (correo) => {
-    return [
-      { id: 'BOL-2026-001', fecha: '2026-10-01', total: 32980, items: '1x Naturaleza Muerta, 1x Rap con R de Revolución', estado: 'Entregado' },
-      { id: 'BOL-2026-008', fecha: '2026-10-05', total: 19990, items: '1x El Círculo (Kase.O)', estado: 'En camino' }
-    ];
+  // OBTENER HISTORIAL REAL DE COMPRAS DESDE LOCALSTORAGE ('ordenesApp')
+  const obtenerHistorialCliente = (correoCliente) => {
+    const todasLasOrdenes = JSON.parse(localStorage.getItem('ordenesApp')) || [];
+    return todasLasOrdenes.filter(
+      (orden) => orden.correo && orden.correo.toLowerCase() === correoCliente.toLowerCase()
+    );
   };
 
   return (
@@ -308,7 +308,7 @@ export const AdminUsuarios = () => {
                       type="text"
                       id="nombre"
                       className="form-control bg-dark text-light border-secondary"
-                      placeholder="Ej: María González"
+                      placeholder="Ej: Cliente ejemplo"
                       value={formData.nombre}
                       onChange={handleInputChange}
                       required
@@ -484,7 +484,7 @@ export const AdminUsuarios = () => {
         </div>
       )}
 
-      {/* MODAL HISTORIAL DE COMPRAS (CLIENTES) */}
+      {/* MODAL HISTORIAL DE COMPRAS (CONECTADO A LOCALSTORAGE) */}
       {modalHistorial && (
         <div className="modal d-block bg-black bg-opacity-75" tabIndex="-1">
           <div className="modal-dialog modal-dialog-centered modal-lg">
@@ -511,32 +511,42 @@ export const AdminUsuarios = () => {
 
                 <h6 className="fw-bold text-uppercase mb-3 text-secondary">Órdenes Registradas</h6>
 
-                <div className="table-responsive">
-                  <table className="table table-dark table-striped align-middle mb-0">
-                    <thead>
-                      <tr className="text-secondary small">
-                        <th>Boleta #</th>
-                        <th>Fecha</th>
-                        <th>Productos</th>
-                        <th>Total</th>
-                        <th>Estado</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {obtenerHistorialSimulado(modalHistorial.correo).map((compra, idx) => (
-                        <tr key={idx}>
-                          <td className="fw-bold text-info">{compra.id}</td>
-                          <td>{compra.fecha}</td>
-                          <td className="small">{compra.items}</td>
-                          <td className="fw-bold text-success">${compra.total.toLocaleString('es-CL')}</td>
-                          <td>
-                            <span className="badge bg-success">{compra.estado}</span>
-                          </td>
+                {obtenerHistorialCliente(modalHistorial.correo).length > 0 ? (
+                  <div className="table-responsive">
+                    <table className="table table-dark table-striped align-middle mb-0">
+                      <thead>
+                        <tr className="text-secondary small">
+                          <th>Boleta #</th>
+                          <th>Fecha</th>
+                          <th>Productos</th>
+                          <th>Total</th>
+                          <th>Estado</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {obtenerHistorialCliente(modalHistorial.correo).map((compra) => (
+                          <tr key={compra.id}>
+                            <td className="fw-bold text-info">{compra.id}</td>
+                            <td className="small">{compra.fecha}</td>
+                            <td className="small">
+                              {compra.productos
+                                ? compra.productos.map((p) => `${p.cantidad}x ${p.nombre}`).join(', ')
+                                : compra.items || 'Sin detalle'}
+                            </td>
+                            <td className="fw-bold text-success">${compra.total.toLocaleString('es-CL')}</td>
+                            <td>
+                              <span className="badge bg-success">{compra.estado}</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-muted text-center py-4 my-0">
+                    Este cliente aún no registra órdenes de compra en la plataforma.
+                  </p>
+                )}
               </div>
 
               <div className="modal-footer border-top border-secondary">
