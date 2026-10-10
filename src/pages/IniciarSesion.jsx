@@ -29,8 +29,15 @@ export const IniciarSesion = () => {
           rol: 'Administrador'
         },
         {
-          nombre: 'Cliente Ejemplo',
+          nombre: 'Administrador secundario',
           run: '222222222',
+          correo: 'admin2@duoc.cl',
+          password: 'admin2',
+          rol: 'Administrador'
+        },
+        {
+          nombre: 'Cliente Ejemplo',
+          run: '444444444',
           correo: 'cliente@gmail.com',
           password: '1234',
           rol: 'Cliente'
