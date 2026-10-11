@@ -58,7 +58,7 @@ export const Checkout = ({ carrito, setCarrito, setOrdenActual }) => {
     setOrdenActual(nuevaOrden);
 
     // Simulación de pasarela de pago (90% éxito / 10% fallo)
-    const exito = Math.random() > 0.1;
+    const exito = Math.random() > 0.4;
     if (exito) {
       setCarrito([]); // Vaciar carrito tras compra exitosa
       navigate('/pago-exitoso');

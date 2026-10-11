@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
-import { Categorias } from '../pages/Categorias';
+import { Categorias } from './Categorias';
 
 // Wrapper para componentes que usan <Link> de react-router-dom
 const renderWithRouter = (ui) => {
