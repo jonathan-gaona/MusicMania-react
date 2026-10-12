@@ -13,12 +13,15 @@ export const AdminDashboard = () => {
   // ESTADO DE NAVEGACIÓN
   const [tabActiva, setTabActiva] = useState('dashboard');
 
+  // ESTADOS DE MÉTRICAS DESDE LOCALSTORAGE
   const [metricasUsuarios, setMetricasUsuarios] = useState({
     total: 0,
     clientes: 0,
     admins: 0
   });
+  const [totalVentas, setTotalVentas] = useState(0);
 
+  // VERIFICACIÓN DE PERMISOS
   useEffect(() => {
     const sesionGuardada = localStorage.getItem('usuarioSesion');
 
@@ -41,7 +44,9 @@ export const AdminDashboard = () => {
     }
   }, [navigate]);
 
-  const actualizarMetricasUsuarios = () => {
+  // ACTUALIZAR MÉTRICAS GENERALES DESDE LOCALSTORAGE
+  const actualizarMetricas = () => {
+    // 1. Usuarios
     const usuariosGuardados = JSON.parse(localStorage.getItem('usuariosApp')) || [];
     const clientes = usuariosGuardados.filter((u) => u.rol === 'Cliente').length;
     const admins = usuariosGuardados.filter((u) => u.rol === 'Administrador').length;
@@ -51,11 +56,16 @@ export const AdminDashboard = () => {
       clientes,
       admins
     });
+
+    // 2. Órdenes / Ventas
+    const ordenesGuardadas = JSON.parse(localStorage.getItem('ordenesApp')) || [];
+    const ventasCalculadas = ordenesGuardadas.reduce((acc, curr) => acc + (curr.total || 0), 0);
+    setTotalVentas(ventasCalculadas);
   };
 
   useEffect(() => {
     if (!cargando) {
-      actualizarMetricasUsuarios();
+      actualizarMetricas();
     }
   }, [cargando, tabActiva]);
 
@@ -70,10 +80,11 @@ export const AdminDashboard = () => {
 
   return (
     <div className="bg-dark text-light min-vh-100 d-flex flex-column">
+      {/* NAVBAR DE ADMINISTRADOR */}
       <AdminNavbar usuarioSesion={usuarioSesion} />
 
       <div className="d-flex flex-grow-1">
-        {/* MENÚ LATERAL */}
+        {/* MENÚ LATERAL INTERACTIVO */}
         <aside
           className="bg-black bg-opacity-50 border-end border-secondary p-3 d-none d-md-flex flex-column justify-content-between"
           style={{ width: '250px' }}
@@ -124,7 +135,6 @@ export const AdminDashboard = () => {
               <i className="bi bi-people"></i> Usuarios
             </button>
 
-            {/* OPCIÓN NUEVA: BLOGS */}
             <button
               onClick={() => setTabActiva('blogs')}
               className={`nav-link text-start d-flex align-items-center gap-2 py-2 px-3 fw-semibold rounded ${
@@ -148,6 +158,7 @@ export const AdminDashboard = () => {
         {/* CONTENIDO PRINCIPAL */}
         <main className="flex-grow-1 p-4 p-md-5 overflow-auto">
           
+          {/* VISTA 1: DASHBOARD PRINCIPAL */}
           {tabActiva === 'dashboard' && (
             <div className="animate__animated animate__fadeIn">
               <header className="mb-4 pb-3 border-bottom border-secondary">
@@ -155,7 +166,47 @@ export const AdminDashboard = () => {
                 <p className="text-secondary mb-0">Resumen general de las operaciones de MusicMania.</p>
               </header>
 
-              {/* MÓDULOS DEL SISTEMA */}
+              {/* TARJETAS KPIS / RESÚMENES GENERALES */}
+              <section className="row g-4 mb-5">
+                <div className="col-12 col-md-4">
+                  <div className="bg-primary bg-opacity-20 border border-primary p-4 rounded-3 shadow d-flex align-items-center justify-content-between">
+                    <div>
+                      <span className="text-uppercase fs-7 fw-bold text-white">Compras Totales</span>
+                      <h3 className="display-6 fw-bold my-1">
+                        ${totalVentas > 0 ? totalVentas.toLocaleString('es-CL') : '1,234,990'}
+                      </h3>
+                      <small className="text-light opacity-75">Hasta el dia de hoy</small>
+                    </div>
+                    <i className="bi bi-cart-check fs-1 text-primary"></i>
+                  </div>
+                </div>
+
+                <div className="col-12 col-md-4">
+                  <div className="bg-success bg-opacity-20 border border-success p-4 rounded-3 shadow d-flex align-items-center justify-content-between">
+                    <div>
+                      <span className="text-uppercase fs-7 fw-bold text-white">Productos totales:</span>
+                      <h3 className="display-6 fw-bold my-1">400</h3>
+                      <small className="text-light opacity-75">Inventario del mes: <strong>700</strong></small>
+                    </div>
+                    <i className="bi bi-box-seam fs-1 text-success"></i>
+                  </div>
+                </div>
+
+                <div className="col-12 col-md-4">
+                  <div className="bg-warning bg-opacity-20 border border-warning p-4 rounded-3 shadow d-flex align-items-center justify-content-between">
+                    <div>
+                      <span className="text-uppercase fs-7 fw-bold text-white">Usuarios Registrados</span>
+                      <h3 className="display-6 fw-bold my-1">{metricasUsuarios.total}</h3>
+                      <small className="text-light opacity-75">
+                        <strong>{metricasUsuarios.clientes}</strong> Clientes | <strong>{metricasUsuarios.admins}</strong> Admins
+                      </small>
+                    </div>
+                    <i className="bi bi-people fs-1 text-warning"></i>
+                  </div>
+                </div>
+              </section>
+
+              {/* ACCESOS RÁPIDOS A MÓDULOS */}
               <section>
                 <h4 className="fw-bold text-uppercase mb-4 text-light">Módulos del Sistema</h4>
                 <div className="row g-4">
@@ -203,4 +254,4 @@ export const AdminDashboard = () => {
       </div>
     </div>
   );
-};  
+};
