@@ -4,6 +4,8 @@ import { AdminNavbar } from '../components/AdminNavbar';
 import { AdminUsuarios } from './AdminUsuarios';
 import { AdminOrdenes } from './AdminOrdenes';
 import { AdminBlogs } from './AdminBlogs';
+import { AdminProductos } from './AdminProductos';
+import { AdminCategorias } from './AdminCategorias';
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -175,7 +177,7 @@ export const AdminDashboard = () => {
                       <h3 className="display-6 fw-bold my-1">
                         ${totalVentas > 0 ? totalVentas.toLocaleString('es-CL') : '1,234,990'}
                       </h3>
-                      <small className="text-light opacity-75">Hasta el dia de hoy</small>
+                      <small className="text-light opacity-75">Hasta el día de hoy</small>
                     </div>
                     <i className="bi bi-cart-check fs-1 text-primary"></i>
                   </div>
@@ -184,7 +186,7 @@ export const AdminDashboard = () => {
                 <div className="col-12 col-md-4">
                   <div className="bg-success bg-opacity-20 border border-success p-4 rounded-3 shadow d-flex align-items-center justify-content-between">
                     <div>
-                      <span className="text-uppercase fs-7 fw-bold text-white">Productos totales:</span>
+                      <span className="text-uppercase fs-7 fw-bold text-white">Productos Totales</span>
                       <h3 className="display-6 fw-bold my-1">400</h3>
                       <small className="text-light opacity-75">Inventario del mes: <strong>700</strong></small>
                     </div>
@@ -240,12 +242,14 @@ export const AdminDashboard = () => {
           {tabActiva === 'usuarios' && <AdminUsuarios />}
           {tabActiva === 'ordenes' && <AdminOrdenes />}
           {tabActiva === 'blogs' && <AdminBlogs />}
+          {tabActiva === 'productos' && <AdminProductos />}
+          {tabActiva === 'categorias' && <AdminCategorias />}
 
-          {/* MENSAJE TEMPORAL PARA MÓDULOS PENDIENTES */}
-          {['productos', 'categorias', 'reportes'].includes(tabActiva) && (
+          {/* MENSAJE TEMPORAL SOLO PARA MÓDULOS PENDIENTES */}
+          {tabActiva === 'reportes' && (
             <div className="text-center py-5 bg-secondary bg-opacity-10 rounded border border-secondary">
-              <i className="bi bi-gear fs-1 text-warning mb-3 d-block"></i>
-              <h4 className="fw-bold text-uppercase">Módulo de {tabActiva}</h4>
+              <i className="bi bi-bar-chart-line fs-1 text-warning mb-3 d-block"></i>
+              <h4 className="fw-bold text-uppercase">Módulo de Reportes</h4>
               <p className="text-secondary">Sección lista para ser conectada.</p>
             </div>
           )}

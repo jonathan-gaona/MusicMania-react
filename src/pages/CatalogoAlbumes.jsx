@@ -1,14 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { albumes } from '../data/albumesData';
+import { albumes as albumesBase } from '../data/albumesData';
 import { AlbumCard } from '../components/AlbumCard';
 
 export const CatalogoAlbumes = ({ agregarAlCarrito }) => {
   const [toast, setToast] = useState('');
 
+  // Sincronización con productos creados/editados en Admin
+  const [listaProductos, setListaProductos] = useState(() => {
+    const productosAdmin = localStorage.getItem('adminProductos');
+    if (productosAdmin) {
+      const parsed = JSON.parse(productosAdmin);
+      const vinilos = parsed.filter(p => !p.categoria || p.categoria === 'vinilos');
+      return vinilos.length > 0 ? vinilos : albumesBase;
+    }
+    return albumesBase;
+  });
+
+  useEffect(() => {
+    const productosAdmin = localStorage.getItem('adminProductos');
+    if (productosAdmin) {
+      const parsed = JSON.parse(productosAdmin);
+      const vinilos = parsed.filter(p => !p.categoria || p.categoria === 'vinilos');
+      if (vinilos.length > 0) {
+        setListaProductos(vinilos);
+      }
+    }
+  }, []);
+
   const handleAgregar = (album) => {
     if (agregarAlCarrito) {
-      // Nos aseguramos de enviar la estructura completa del álbum con su id
       agregarAlCarrito({
         id: album.id,
         nombre: album.titulo || album.nombre,
@@ -55,7 +76,7 @@ export const CatalogoAlbumes = ({ agregarAlCarrito }) => {
 
         {/* Grid de Productos */}
         <div className="row g-4 mb-5">
-          {albumes.map((album) => (
+          {listaProductos.map((album) => (
             <AlbumCard
               key={album.id}
               album={album}
@@ -67,7 +88,7 @@ export const CatalogoAlbumes = ({ agregarAlCarrito }) => {
         {/* Botón para ver reseñas */}
         <div className="d-flex justify-content-center mt-4">
           <Link
-            to="/resenas"
+            to="/resena"
             className="btn btn-warning fw-bold px-4 py-3 shadow"
           >
             Ver Reseñas de Álbumes

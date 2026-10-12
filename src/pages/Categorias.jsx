@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { albumes } from '../data/albumesData';
 
-// Reutilizamos la misma lista de Equipos
-const productosEquipos = [
+const productosEquiposBase = [
   {
     id: 'eq-1',
     categoria: 'equipos',
@@ -48,21 +47,20 @@ const productosEquipos = [
   },
 ];
 
-// Accesorios de ejemplo con imágenes reales de tu proyecto
-const productosAccesorios = [
+const productosAccesoriosBase = [
   {
     id: 'acc-1',
     categoria: 'accesorios',
     nombre: 'Limpiador de Vinilos v1',
     precio: 15990,
-    imagen: '/img/limpiadorVinilos.jpg', // Cambia por la ruta de imagen real de tus accesorios
+    imagen: '/img/limpiadorVinilos.jpg',
   },
   {
     id: 'acc-2',
     categoria: 'accesorios',
     nombre: 'Limpiador de Vinilos Pro',
     precio: 17990,
-    imagen: '/img/Limpiavinilo2.jpg', // Cambia por la ruta de imagen real de tus accesorios
+    imagen: '/img/Limpiavinilo2.jpg',
   },
 ];
 
@@ -70,27 +68,48 @@ export const Categorias = ({ agregarAlCarrito }) => {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('todas');
   const [toast, setToast] = useState('');
 
-  // Formateamos álbumes para que coincidan con la estructura general
-  const vinilosFormateados = albumes.map((alb) => ({
-    id: alb.id,
-    categoria: 'vinilos',
-    nombre: `${alb.titulo} - ${alb.artista}`,
-    precio: alb.precio,
-    imagen: alb.imagen,
-    ...alb
-  }));
+  // Sincronización dinámica de productos desde localStorage o listas base
+  const [todosLosProductos, setTodosLosProductos] = useState(() => {
+    const productosAdmin = localStorage.getItem('adminProductos');
+    if (productosAdmin) {
+      const parsed = JSON.parse(productosAdmin);
+      return parsed.map((p) => ({
+        ...p,
+        nombre: p.nombre || p.titulo,
+        categoria: p.categoria || (String(p.id).startsWith('eq-') ? 'equipos' : String(p.id).startsWith('acc-') ? 'accesorios' : 'vinilos'),
+      }));
+    }
 
-  // Combinar todos los productos en una sola lista unificada
-  const todosLosProductos = [
-    ...vinilosFormateados,
-    ...productosEquipos,
-    ...productosAccesorios,
-  ];
+    const vinilosFormateados = albumes.map((alb) => ({
+      id: alb.id,
+      categoria: 'vinilos',
+      nombre: alb.titulo ? `${alb.titulo} - ${alb.artista}` : alb.nombre,
+      precio: alb.precio,
+      imagen: alb.imagen,
+      ...alb,
+    }));
 
-  // Filtrar según el botón seleccionado
-  const productosFiltrados = categoriaSeleccionada === 'todas'
-    ? todosLosProductos
-    : todosLosProductos.filter((prod) => prod.categoria === categoriaSeleccionada);
+    return [...vinilosFormateados, ...productosEquiposBase, ...productosAccesoriosBase];
+  });
+
+  useEffect(() => {
+    const productosAdmin = localStorage.getItem('adminProductos');
+    if (productosAdmin) {
+      const parsed = JSON.parse(productosAdmin);
+      const formateados = parsed.map((p) => ({
+        ...p,
+        nombre: p.nombre || p.titulo,
+        categoria: p.categoria || (String(p.id).startsWith('eq-') ? 'equipos' : String(p.id).startsWith('acc-') ? 'accesorios' : 'vinilos'),
+      }));
+      setTodosLosProductos(formateados);
+    }
+  }, []);
+
+  // Filtrar según la categoría seleccionada
+  const productosFiltrados =
+    categoriaSeleccionada === 'todas'
+      ? todosLosProductos
+      : todosLosProductos.filter((prod) => prod.categoria === categoriaSeleccionada);
 
   const handleAgregar = (producto) => {
     if (agregarAlCarrito) {
@@ -108,7 +127,6 @@ export const Categorias = ({ agregarAlCarrito }) => {
 
   return (
     <main className="container py-5 text-white position-relative">
-      
       {/* Toast Notificación Flotante */}
       {toast && (
         <div className="position-fixed top-0 end-0 p-3" style={{ zIndex: 1055, marginTop: '70px' }}>
@@ -118,9 +136,9 @@ export const Categorias = ({ agregarAlCarrito }) => {
                 <i className="bi bi-check-circle-fill me-2"></i>
                 {toast}
               </div>
-              <button 
-                type="button" 
-                className="btn-close btn-close-white me-2 m-auto" 
+              <button
+                type="button"
+                className="btn-close btn-close-white me-2 m-auto"
                 onClick={() => setToast('')}
               ></button>
             </div>
@@ -158,14 +176,14 @@ export const Categorias = ({ agregarAlCarrito }) => {
               <img
                 src={prod.imagen}
                 className="card-img-top"
-                alt={prod.nombre}
+                alt={prod.nombre || prod.titulo}
                 style={{ height: '220px', objectFit: 'cover' }}
               />
               <div className="card-body d-flex flex-column justify-content-between">
                 <div>
-                  <h2 className="h6 card-title fw-bold text-center mb-2">{prod.nombre}</h2>
+                  <h2 className="h6 card-title fw-bold text-center mb-2">{prod.nombre || prod.titulo}</h2>
                   <p className="fs-5 fw-bold text-danger text-center mb-3">
-                    $ {prod.precio.toLocaleString('es-CL')}
+                    $ {Number(prod.precio).toLocaleString('es-CL')}
                   </p>
                 </div>
 

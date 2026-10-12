@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-const productosEquipos = [
+const productosEquiposBase = [
   {
     id: 'eq-1',
     nombre: 'Amplificador de Guitarra Marshall',
@@ -49,18 +49,39 @@ const productosEquipos = [
 export const Equipos = ({ agregarAlCarrito }) => {
   const [toast, setToast] = useState('');
 
+  // Sincronización con productos creados/editados en Admin
+  const [listaEquipos, setListaEquipos] = useState(() => {
+    const productosAdmin = localStorage.getItem('adminProductos');
+    if (productosAdmin) {
+      const parsed = JSON.parse(productosAdmin);
+      const equiposFiltrados = parsed.filter(p => p.categoria === 'equipos' || String(p.id).startsWith('eq-'));
+      return equiposFiltrados.length > 0 ? equiposFiltrados : productosEquiposBase;
+    }
+    return productosEquiposBase;
+  });
+
+  useEffect(() => {
+    const productosAdmin = localStorage.getItem('adminProductos');
+    if (productosAdmin) {
+      const parsed = JSON.parse(productosAdmin);
+      const equiposFiltrados = parsed.filter(p => p.categoria === 'equipos' || String(p.id).startsWith('eq-'));
+      if (equiposFiltrados.length > 0) {
+        setListaEquipos(equiposFiltrados);
+      }
+    }
+  }, []);
+
   const handleAgregar = (producto) => {
     if (agregarAlCarrito) {
-      // Se pasa el objeto completo incluyendo el ID para no sobreescribir otros productos
       agregarAlCarrito({
         id: producto.id,
-        nombre: producto.nombre,
+        nombre: producto.nombre || producto.titulo,
         precio: producto.precio,
         imagen: producto.imagen,
       });
     }
 
-    setToast(`¡"${producto.nombre}" se agregó al carrito!`);
+    setToast(`¡"${producto.nombre || producto.titulo}" se agregó al carrito!`);
 
     setTimeout(() => {
       setToast('');
@@ -99,28 +120,27 @@ export const Equipos = ({ agregarAlCarrito }) => {
 
       {/* Grid de Productos */}
       <div className="row g-4">
-        {productosEquipos.map((producto) => (
+        {listaEquipos.map((producto) => (
           <article key={producto.id} className="col-md-6 col-lg-4">
             <div className="card h-100 bg-dark text-white border-secondary shadow-sm">
               <img
                 src={producto.imagen}
                 className="card-img-top img-efecto"
-                alt={producto.nombre}
+                alt={producto.nombre || producto.titulo}
                 style={{ height: '220px', objectFit: 'cover' }}
               />
               <div className="card-body d-flex flex-column">
-                <h2 className="card-title h5 fw-bold">{producto.nombre}</h2>
+                <h2 className="card-title h5 fw-bold">{producto.nombre || producto.titulo}</h2>
                 <p className="card-text text-white-50 small flex-grow-1">
-                  {producto.descripcion}
+                  {producto.descripcion || 'Equipo de sonido de alta fidelidad listo para tu setup.'}
                 </p>
                 
                 <div className="pt-2 border-top border-secondary mt-3">
                   <span className="fs-4 fw-bold text-danger d-block mb-3">
-                    $ {producto.precio.toLocaleString('es-CL')}
+                    $ {Number(producto.precio).toLocaleString('es-CL')}
                   </span>
                   
                   <div className="d-flex gap-2">
-                    {/* Botón para ver el detalle en una página individual */}
                     <Link 
                       to={`/producto/${producto.id}`} 
                       className="btn btn-outline-light btn-sm flex-fill fw-bold"
@@ -128,7 +148,6 @@ export const Equipos = ({ agregarAlCarrito }) => {
                       Ver Detalle
                     </Link>
 
-                    {/* Botón para agregar directo al carrito */}
                     <button
                       className="btn btn-danger btn-sm flex-fill fw-bold"
                       onClick={() => handleAgregar(producto)}
