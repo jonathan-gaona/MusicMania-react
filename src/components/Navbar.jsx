@@ -1,7 +1,20 @@
 import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 
 export const Navbar = ({ totalItemsCarrito = 0 }) => {
+  const navigate = useNavigate();
+
+  // 1. OBTENER SESIÓN DESDE LOCALSTORAGE
+  const sesionGuardada = localStorage.getItem('usuarioSesion');
+  const usuarioSesion = sesionGuardada ? JSON.parse(sesionGuardada) : null;
+  const esAdmin = usuarioSesion && usuarioSesion.rol === 'Administrador';
+
+  // 2. FUNCIÓN PARA CERRAR SESIÓN
+  const handleCerrarSesion = () => {
+    localStorage.removeItem('usuarioSesion');
+    navigate('/iniciar-sesion');
+  };
+
   return (
     <header>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
@@ -39,8 +52,6 @@ export const Navbar = ({ totalItemsCarrito = 0 }) => {
                   Equipos
                 </NavLink>
               </li>
-
-              {/* Nuevas vistas requeridas agregadas al menú */}
               <li className="nav-item">
                 <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/categorias">
                   Categorías
@@ -51,7 +62,6 @@ export const Navbar = ({ totalItemsCarrito = 0 }) => {
                   Ofertas
                 </NavLink>
               </li>
-
               <li className="nav-item">
                 <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/blog">
                   Blog
@@ -75,12 +85,62 @@ export const Navbar = ({ totalItemsCarrito = 0 }) => {
             </ul>
 
             <div className="d-flex flex-column flex-lg-row align-items-lg-center gap-2 gap-lg-3 ms-lg-auto">
-              <Link className="nav-link text-light" to="/iniciar-sesion">
-                Iniciar sesión
-              </Link>
-              <Link className="nav-link text-light" to="/registro">
-                Registrarse
-              </Link>
+              
+              {/* BOTÓN PARA REGRESAR AL DASHBOARD (SOLO SE MUESTRA SI ES ADMIN) */}
+              {esAdmin && (
+                <Link
+                  to="/admin"
+                  className="btn btn-danger btn-sm fw-bold text-uppercase d-flex align-items-center justify-content-center gap-1 shadow"
+                  title="Volver al Panel de Administración"
+                >
+                  <i className="bi bi-speedometer2"></i>
+                  <span>Panel Admin</span>
+                </Link>
+              )}
+
+              {/* CONTROL DE SESIÓN DEL USUARIO */}
+              {usuarioSesion ? (
+                <div className="dropdown">
+                  <button
+                    className="btn btn-outline-danger btn-sm dropdown-toggle fw-bold"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                  >
+                    {usuarioSesion.nombre ? usuarioSesion.nombre.split(' ')[0] : 'Cuenta'}
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-end bg-dark border-secondary">
+                    <li>
+                      <span className="dropdown-item-text text-secondary small">
+                        Rol: <strong className="text-light">{usuarioSesion.rol}</strong>
+                      </span>
+                    </li>
+                    {esAdmin && (
+                      <li>
+                        <Link className="dropdown-item text-danger fw-bold" to="/admin">
+                          <i className="bi bi-gear me-1"></i> Ir al Admin
+                        </Link>
+                      </li>
+                    )}
+                    <li><hr className="dropdown-divider border-secondary" /></li>
+                    <li>
+                      <button className="dropdown-item text-light" onClick={handleCerrarSesion}>
+                        <i className="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              ) : (
+                <>
+                  <Link className="nav-link text-light" to="/iniciar-sesion">
+                    Iniciar sesión
+                  </Link>
+                  <Link className="nav-link text-light" to="/registro">
+                    Registrarse
+                  </Link>
+                </>
+              )}
+
+              {/* CARRITO DE COMPRAS */}
               <Link className="btn btn-outline-light btn-sm fw-bold" to="/carrito" id="btn-carrito">
                 Carrito ({totalItemsCarrito})
               </Link>
