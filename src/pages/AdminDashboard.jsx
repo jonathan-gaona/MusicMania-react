@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AdminNavbar } from '../components/AdminNavbar';
 import { AdminUsuarios } from './AdminUsuarios';
 import { AdminOrdenes } from './AdminOrdenes';
+import { AdminBlogs } from './AdminBlogs';
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -12,14 +13,12 @@ export const AdminDashboard = () => {
   // ESTADO DE NAVEGACIÓN
   const [tabActiva, setTabActiva] = useState('dashboard');
 
-  // ESTADO PARA MÉTRICAS DE USUARIOS DESDE LOCALSTORAGE
   const [metricasUsuarios, setMetricasUsuarios] = useState({
     total: 0,
     clientes: 0,
     admins: 0
   });
 
-  // VERIFICACIÓN DE PERMISOS Y CARGA DE DATOS
   useEffect(() => {
     const sesionGuardada = localStorage.getItem('usuarioSesion');
 
@@ -42,7 +41,6 @@ export const AdminDashboard = () => {
     }
   }, [navigate]);
 
-  // CARGAR / ACTUALIZAR MÉTRICAS DE USUARIOS
   const actualizarMetricasUsuarios = () => {
     const usuariosGuardados = JSON.parse(localStorage.getItem('usuariosApp')) || [];
     const clientes = usuariosGuardados.filter((u) => u.rol === 'Cliente').length;
@@ -55,7 +53,6 @@ export const AdminDashboard = () => {
     });
   };
 
-  // Re-calcular métricas al cargar y cada vez que se vuelve al Dashboard
   useEffect(() => {
     if (!cargando) {
       actualizarMetricasUsuarios();
@@ -73,11 +70,10 @@ export const AdminDashboard = () => {
 
   return (
     <div className="bg-dark text-light min-vh-100 d-flex flex-column">
-      {/* NAVBAR DE ADMINISTRADOR */}
       <AdminNavbar usuarioSesion={usuarioSesion} />
 
       <div className="d-flex flex-grow-1">
-        {/* MENÚ LATERAL INTERACTIVO */}
+        {/* MENÚ LATERAL */}
         <aside
           className="bg-black bg-opacity-50 border-end border-secondary p-3 d-none d-md-flex flex-column justify-content-between"
           style={{ width: '250px' }}
@@ -128,6 +124,16 @@ export const AdminDashboard = () => {
               <i className="bi bi-people"></i> Usuarios
             </button>
 
+            {/* OPCIÓN NUEVA: BLOGS */}
+            <button
+              onClick={() => setTabActiva('blogs')}
+              className={`nav-link text-start d-flex align-items-center gap-2 py-2 px-3 fw-semibold rounded ${
+                tabActiva === 'blogs' ? 'bg-danger text-white' : 'text-light opacity-75'
+              }`}
+            >
+              <i className="bi bi-journal-text"></i> Blogs
+            </button>
+
             <button
               onClick={() => setTabActiva('reportes')}
               className={`nav-link text-start d-flex align-items-center gap-2 py-2 px-3 fw-semibold rounded ${
@@ -142,7 +148,6 @@ export const AdminDashboard = () => {
         {/* CONTENIDO PRINCIPAL */}
         <main className="flex-grow-1 p-4 p-md-5 overflow-auto">
           
-          {/* VISTA 1: DASHBOARD PRINCIPAL */}
           {tabActiva === 'dashboard' && (
             <div className="animate__animated animate__fadeIn">
               <header className="mb-4 pb-3 border-bottom border-secondary">
@@ -150,45 +155,7 @@ export const AdminDashboard = () => {
                 <p className="text-secondary mb-0">Resumen general de las operaciones de MusicMania.</p>
               </header>
 
-              {/* TARJETAS KPIS */}
-              <section className="row g-4 mb-5">
-                <div className="col-12 col-md-4">
-                  <div className="bg-primary bg-opacity-20 border border-primary p-4 rounded-3 shadow d-flex align-items-center justify-content-between">
-                    <div>
-                      <span className="text-uppercase fs-7 fw-bold text-info">Compras</span>
-                      <h3 className="display-6 fw-bold my-1">$1,234,990</h3>
-                      <small className="text-light opacity-75">Probabilidad de aumento: <strong>20%</strong></small>
-                    </div>
-                    <i className="bi bi-cart-check fs-1 text-primary"></i>
-                  </div>
-                </div>
-
-                <div className="col-12 col-md-4">
-                  <div className="bg-success bg-opacity-20 border border-success p-4 rounded-3 shadow d-flex align-items-center justify-content-between">
-                    <div>
-                      <span className="text-uppercase fs-7 fw-bold text-success">Productos</span>
-                      <h3 className="display-6 fw-bold my-1">400</h3>
-                      <small className="text-light opacity-75">Inventario actual: <strong>500</strong></small>
-                    </div>
-                    <i className="bi bi-box-seam fs-1 text-success"></i>
-                  </div>
-                </div>
-
-                <div className="col-12 col-md-4">
-                  <div className="bg-warning bg-opacity-20 border border-warning p-4 rounded-3 shadow d-flex align-items-center justify-content-between">
-                    <div>
-                      <span className="text-uppercase fs-7 fw-bold text-warning">Usuarios Registrados</span>
-                      <h3 className="display-6 fw-bold my-1">{metricasUsuarios.total}</h3>
-                      <small className="text-light opacity-75">
-                        <strong>{metricasUsuarios.clientes}</strong> Clientes | <strong>{metricasUsuarios.admins}</strong> Admins
-                      </small>
-                    </div>
-                    <i className="bi bi-people fs-1 text-warning"></i>
-                  </div>
-                </div>
-              </section>
-
-              {/* ACCESOS RÁPIDOS A MÓDULOS */}
+              {/* MÓDULOS DEL SISTEMA */}
               <section>
                 <h4 className="fw-bold text-uppercase mb-4 text-light">Módulos del Sistema</h4>
                 <div className="row g-4">
@@ -198,6 +165,7 @@ export const AdminDashboard = () => {
                     { id: 'productos', title: 'Productos', desc: 'Administrar inventario y catálogo.', icon: 'bi-disc', color: 'text-success' },
                     { id: 'categorias', title: 'Categorías', desc: 'Organizar productos por géneros.', icon: 'bi-tags', color: 'text-warning' },
                     { id: 'usuarios', title: 'Usuarios', desc: `Gestión de ${metricasUsuarios.total} cuentas activas.`, icon: 'bi-people', color: 'text-primary' },
+                    { id: 'blogs', title: 'Blogs', desc: 'Administración de artículos y noticias.', icon: 'bi-journal-text', color: 'text-info' },
                     { id: 'reportes', title: 'Reportes', desc: 'Generación de informes detallados.', icon: 'bi-bar-chart-line', color: 'text-danger' }
                   ].map((mod) => (
                     <div key={mod.id} className="col-12 col-md-6 col-lg-4">
@@ -217,11 +185,10 @@ export const AdminDashboard = () => {
             </div>
           )}
 
-          {/* VISTA 2: COMPONENTE DE USUARIOS */}
+          {/* VISTAS DE COMPONENTES */}
           {tabActiva === 'usuarios' && <AdminUsuarios />}
-
-          {/* VISTA 3: COMPONENTE DE ÓRDENES */}
           {tabActiva === 'ordenes' && <AdminOrdenes />}
+          {tabActiva === 'blogs' && <AdminBlogs />}
 
           {/* MENSAJE TEMPORAL PARA MÓDULOS PENDIENTES */}
           {['productos', 'categorias', 'reportes'].includes(tabActiva) && (
@@ -236,4 +203,4 @@ export const AdminDashboard = () => {
       </div>
     </div>
   );
-};
+};  
